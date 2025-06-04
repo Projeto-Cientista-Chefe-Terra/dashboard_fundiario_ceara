@@ -4,6 +4,7 @@ import folium
 import geopandas as gpd
 import pandas as pd
 from branca.element import Template, MacroElement
+import streamlit as st
 
 # Cores de dominância
 from public.cores import CORES

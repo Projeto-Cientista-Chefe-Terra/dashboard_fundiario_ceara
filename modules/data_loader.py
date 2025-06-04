@@ -12,7 +12,7 @@ _DATA_PREFIX    = 'dataset-malha-fundiaria-idace_preprocessado-'
 _DATA_SUFFIX    = '.csv'
 _MUNI_GEOJSON   = 'geojson-municipios_ceara-normalizado.geojson'
 
-
+@st.cache_data
 def get_latest_dataset(base_folder: str) -> str:
     files = [f for f in os.listdir(base_folder)
              if f.startswith(_DATA_PREFIX) and f.endswith(_DATA_SUFFIX)]
@@ -60,7 +60,7 @@ def load_csv_data(base_folder: str) -> pd.DataFrame:
 
     return df
 
-
+@st.cache_resource
 def load_municipios(base_folder: str) -> gpd.GeoDataFrame:
     """
     Lê o GeoJSON de municípios, detecta primeiro 'NM_MUN' e, se não achar,
@@ -112,6 +112,7 @@ def load_municipios(base_folder: str) -> gpd.GeoDataFrame:
 #         'descartados':            total - len(df_class)
 #     }
 #     return df, df_class, df_inter, df_ctx, counts
+@st.cache_resource
 def validate_data(df: pd.DataFrame):
     """
     Recebe DataFrame de load_csv_data e retorna:

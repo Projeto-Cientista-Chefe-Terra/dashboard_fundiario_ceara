@@ -13,6 +13,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from public.cores import CORES as cores
+import streamlit as st
+
 
 # Add this near the top of the code (with other constants)
 
@@ -21,7 +23,7 @@ CORES = cores
 CORES["Sem Registro"] = "#9fa2a5"
 
 
-
+@st.cache_data
 def filtrar_dados(df: pd.DataFrame, scope: str, entidade: str = None) -> pd.DataFrame:
     if scope == "Todo o Estado":
         return df
@@ -32,7 +34,7 @@ def filtrar_dados(df: pd.DataFrame, scope: str, entidade: str = None) -> pd.Data
     else:
         raise ValueError(f"Escopo desconhecido: {scope}")
 
-
+@st.cache_data
 def classificar_propriedades(df: pd.DataFrame):
     mf = df["modulo_fiscal"]
     area = df["area"]
@@ -51,6 +53,7 @@ def classificar_propriedades(df: pd.DataFrame):
 
 
 # Modify the plot_barras function:
+@st.cache_data
 def plot_barras(resultados, titulo, subtitulo) -> plt.Figure:
     """
     Plota gráfico de barras com os valores e anota os totais acima de cada barra.
@@ -95,6 +98,7 @@ def plot_barras(resultados, titulo, subtitulo) -> plt.Figure:
 
 
 # Modify the plot_pizza function:
+@st.cache_data
 def plot_pizza(resultados, titulo, subtitulo) -> plt.Figure:
     """
     Plota gráfico de pizza com percentuais e legenda.
@@ -133,7 +137,7 @@ def plot_pizza(resultados, titulo, subtitulo) -> plt.Figure:
     plt.tight_layout()
     return fig
 
-
+@st.cache_data
 def compute_stats_df(df: pd.DataFrame) -> pd.DataFrame:
     stats = df["area"].describe()
     stats = stats.rename(
