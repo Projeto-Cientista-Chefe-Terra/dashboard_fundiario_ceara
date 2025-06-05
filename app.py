@@ -70,8 +70,8 @@ preprocessar_tudo = st.cache_resource()(
 # 0) Definição de funções de visualizações
 # --------------------------------------------------- 
 def graficos_e_quadros():
-    col1, col2 = st.columns([1, 1]) 
-    tab1, tab2 = col1.tabs(["📈 Barra", "📈 Pizza"])
+    col1, col2 = st.columns([3, 2]) 
+    tab1, tab2 = col1.tabs(["Gráfico de Barras", "Gráfico de Pizza"])
     co2_1, co2_2 = col2.columns([1, 1]) 
     opcao = co2_1.selectbox(
         "Mostrar por", ["Todo o Estado", "Municípios", "Regiões Administrativas"]
@@ -369,14 +369,39 @@ def mapa_gini():
 # ---------------------------------------------------
 
 
+
 with open("style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 st.title("ccTerra::Classificação de Lotes")
 st.markdown("<h1 class='custom-header'>ccTerra::Dashboard Fundiário</h1>", unsafe_allow_html=True)
-page = st.sidebar.selectbox(
-    "Navegação", ["Gráficos", "Mapa Contextual", "Mapa Interativo", "Mapa Gini"]
-)
+
+# page = st.sidebar.selectbox(
+#     "Navegação", ["Gráficos", "Mapa Contextual", "Mapa Interativo", "Mapa Gini"]
+# )
+page = "Gráficos"
+
+with st.sidebar:
+    st.header("Navegação")
+    # CSS para ícones Font Awesome
+    if st.button("Gráficos e Quadros", use_container_width=True, icon=":material/bar_chart:"):
+        page = "Gráficos"
+    if st.button("Mapa Contextual", use_container_width=True, icon=":material/location_on:"):
+        page = "Mapa Contextual"
+    if st.button("Mapa Interativo", use_container_width=True, icon=":material/map:"):
+        page = "Mapa Interativo"
+    if st.button("Mapa Gini", use_container_width=True, icon=":material/crisis_alert:"):
+        page = "Mapa Gini"
+
+    # Estilo CSS para botões ativos
+    st.markdown("""
+    <style>
+        div[data-testid="stButton"] > button[kind="secondary"] {
+            background-color: #f0f2f6;
+            border-color: #d6d6d6;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 DATA_FOLDER = "data/"
 @st.cache_resource
 def load_once():
