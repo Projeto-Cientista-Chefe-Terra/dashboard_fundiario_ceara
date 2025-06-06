@@ -8,9 +8,9 @@ runOnSave             = true
 
 [theme]
 base                     = "light"
-primaryColor             = "#70587C"
-backgroundColor          = "#C8B8DB"
-secondaryBackgroundColor = "#502F4C"
+primaryColor             = "#B06E2E"
+backgroundColor          = "#FFFFFF"
+secondaryBackgroundColor = "#FAF5F0"
 textColor                = "#000000"
 font                     = "sans serif"
 

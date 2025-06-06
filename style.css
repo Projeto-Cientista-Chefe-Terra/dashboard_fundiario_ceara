@@ -31,22 +31,29 @@ body {
 }
 /* 4. Botões (primaryColor) */
 .stButton button {
-  background-color: #70587C !important;
+  /* background-color: #70587C !important; */
   border-radius: 8px !important;
-  color: #F9F4F5 !important; /* contraste com o fundo escuro */
+  color: #000000 !important;
 }
 
+
+.stSidebar button p{
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+
 /* 5. Hover nos botões — detalhe com cor secundária clara */
-.stButton button:hover {
+/* .stButton button:hover {
   background-color: #F9F4F5 !important;
   color: #70587C !important;
-}
+} */
 
 /* 6. Sidebar (secondaryBackgroundColor) */
 .stSidebar {
   background-color: #FAF5F0 !important;
   font-family: 'Plus Jakarta Sans' !important;
-  color: #F9F4F5; /* texto claro na sidebar escura */
+  color: #000000; /* texto claro na sidebar escura */
 }
 
 /* 7. Títulos e cabeçalhos — mantém Roboto e reforça cor de texto */
@@ -69,9 +76,53 @@ h1, h2, h3, h4, h5, h6 {
 .stSelectbox>div>div>div>div {
   background-color: #F9F4F5 !important;
   color: #000000 !important;
+  font-size: 0.9rem;
+  font-weight: 700;
   /* border: 1px solid #70587C !important; */
   border-radius: 4px !important;
   font-family: 'Plus Jakarta Sans' !important;
+}
+
+/* tab não selecionda */
+/* .stTabs [tabindex="-1"]{
+
+} */
+/* tab selecionada */
+/* Efeito de hover com transição suave */
+.stTabs [tabindex="0"] {
+    background-color: #F5E8DB !important;
+    color: #B06E2E;
+    border-radius: 10px 10px 0px 0px;
+    padding: 6px
+    /* border-radius: 4px !important; */
+    /* transition: all 0.3s ease !important; Transição suave */
+    /* display: inline-block !important; Para o hover funcionar corretamente */
+}
+
+.stTabs p {
+  font-size: 1.25rem ;
+  color: #B06E2E;
+
+}
+
+/* Efeito ao passar o mouse */
+.stTabs button:hover {
+    background-color: #d38f4a18 !important; /* Cor mais clara no hover */
+    border-radius: 10px 10px 0px 0px;}
+
+#op-ent {
+  font-size: 1.15rem;
+}
+
+
+/* Efeito quando clicado (opcional) */
+/* .stTabs .st-h6:active {
+    transform: translateY(0) !important;
+    box-shadow: none !important;
+} */
+.stSelectbox  p {
+  color: #B06E2E;
+  font-size: 1.25rem;
 }
 
 /* 10. Rodapé e outros elementos menores */
@@ -101,7 +152,6 @@ footer, .stMarkdown {
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #c0c0c0;
   color: white;
   padding: 10px 20px;
   z-index: 1000;

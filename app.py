@@ -69,18 +69,20 @@ preprocessar_tudo = st.cache_resource()(
 # ---------------------------------------------------
 # 0) Definição de funções de visualizações
 # --------------------------------------------------- 
+
 def graficos_e_quadros():
     col1, col2 = st.columns([3, 2]) 
     tab1, tab2 = col1.tabs(["Gráfico de Barras", "Gráfico de Pizza"])
+    col2.subheader("Parâmetros de Busca")
     co2_1, co2_2 = col2.columns([1, 1]) 
     opcao = co2_1.selectbox(
-        "Mostrar por", ["Todo o Estado", "Municípios", "Regiões Administrativas"]
+        "Mostrar por:", ["Todo o Estado", "Municípios", "Regiões Administrativas"]
     )
     entidade = None
     if opcao != "Todo o Estado":
         col = "nome_municipio" if opcao == "Municípios" else "regiao_administrativa" 
         entidade = co2_2.selectbox(
-            f"Selecionar {opcao}",
+            f"Selecionar {opcao}:",
             sorted(df_class[col].dropna().unique())
         )
 
@@ -94,7 +96,8 @@ def graficos_e_quadros():
         tab1.pyplot(fig_barra)
         tab2.pyplot(fig_pizza)
 
-        col2.subheader(f"Classificação de Propriedades ({opcao} - {entidade})")
+        col2.subheader(f"Classificação de Propriedades")
+        col2.html(f"""<p id="op-ent">{opcao} - &lt;{entidade}&gt; </p>""")
         col2.table(df_tab)
 
         col2.subheader("Estatísticas Adicionais")
@@ -102,7 +105,7 @@ def graficos_e_quadros():
         fig = plot_pizza(resultados, f"Propriedades - {opcao}", f"Total: {total}")
     
     if resultados:
-        st.html('<sapn>Dados atualizadoe em xx/xx/2025</span>')
+        st.html('<span>Dados atualizadoe em xx/xx/2025</span>')
         df_tab = pd.DataFrame(
             list(resultados.items()), columns=["Categoria", "Quantidade"]
         )
@@ -373,35 +376,26 @@ def mapa_gini():
 with open("style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-st.title("ccTerra::Classificação de Lotes")
 st.markdown("<h1 class='custom-header'>ccTerra::Dashboard Fundiário</h1>", unsafe_allow_html=True)
 
 # page = st.sidebar.selectbox(
 #     "Navegação", ["Gráficos", "Mapa Contextual", "Mapa Interativo", "Mapa Gini"]
 # )
-page = "Gráficos"
+if "current_page" not in st.session_state:
+    st.session_state.current_page = "Gráficos"
 
 with st.sidebar:
-    st.header("Navegação")
+    st.header("Navegação") # TODO fazer o background diferente para o selecionado
     # CSS para ícones Font Awesome
     if st.button("Gráficos e Quadros", use_container_width=True, icon=":material/bar_chart:"):
-        page = "Gráficos"
+        st.session_state.current_page = "Gráficos"
     if st.button("Mapa Contextual", use_container_width=True, icon=":material/location_on:"):
-        page = "Mapa Contextual"
+        st.session_state.current_page = "Mapa Contextual"
     if st.button("Mapa Interativo", use_container_width=True, icon=":material/map:"):
-        page = "Mapa Interativo"
+        st.session_state.current_page = "Mapa Interativo"
     if st.button("Mapa Gini", use_container_width=True, icon=":material/crisis_alert:"):
-        page = "Mapa Gini"
+        st.session_state.current_page = "Mapa Gini"
 
-    # Estilo CSS para botões ativos
-    st.markdown("""
-    <style>
-        div[data-testid="stButton"] > button[kind="secondary"] {
-            background-color: #f0f2f6;
-            border-color: #d6d6d6;
-        }
-    </style>
-    """, unsafe_allow_html=True)
 DATA_FOLDER = "data/"
 @st.cache_resource
 def load_once():
@@ -423,18 +417,22 @@ df_all, df_class, df_inter, df_ctx, counts = load_once()
 
 
 st.logo("./assets/CC_Terra.png", size="large")
-
+st.write(st.session_state.current_page)
 # ---------------------------------------------------
 # 7) Lógica de cada aba
 # ---------------------------------------------------
-if page == "Gráficos":
+if st.session_state.current_page == "Gráficos":
+    st.title("ccTerra::Gráficos e Quadros")
     graficos_e_quadros()
 
-elif page == "Mapa Contextual":
+elif st.session_state.current_page == "Mapa Contextual":
+    st.title("ccTerra::Classificação de Lotes")
     mapa_contextuall()
 
-elif page == "Mapa Gini":
+elif st.session_state.current_page == "Mapa Gini":
+    st.title("ccTerra::Mapa Gini")
     mapa_gini()
 
 else:  # Mapa Interativo
+    st.title("ccTerra::Mapa Interativo")
     mapa_interativo()
