@@ -1,33 +1,31 @@
 /* style.css
     Este arquivo contém o CSS para estilizar o aplicativo Streamlit.
     As cores e fontes foram escolhidas para criar um tema escuro e moderno.
-  */  
+  */
 
 /* 1. Importa Roboto do Google Fonts */
 /* @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap'); */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&display=swap");
 
-html, body, [class*="css"] {
-    font-family: 'Plus Jakarta Sans' !important;
-    font-size: 18px;
-    font-weight: 500;
-    color: #091747;
+html,
+body,
+[class*="css"] {
+  font-family: "Plus Jakarta Sans" !important;
+  font-size: 18px;
+  font-weight: 500;
+  color: #091747;
 }
 
 body {
   /* 2. Fundo do app → backgroundColor */
-  background-color: #FFFFFF;
+  background-color: #ffffff;
 
-  color: #B06E2E; /* textColor */
+  color: #b06e2e; /* textColor */
 }
 
-
-
-
 .stApp {
-  color: #B06E2E;
-  background-color: #FFFFFF;
-
+  color: #b06e2e;
+  background-color: #ffffff;
 }
 /* 4. Botões (primaryColor) */
 .stButton button {
@@ -36,12 +34,10 @@ body {
   color: #000000 !important;
 }
 
-
-.stSidebar button p{
+.stSidebar button p {
   font-size: 1.05rem;
   font-weight: 600;
 }
-
 
 /* 5. Hover nos botões — detalhe com cor secundária clara */
 /* .stButton button:hover {
@@ -51,36 +47,47 @@ body {
 
 /* 6. Sidebar (secondaryBackgroundColor) */
 .stSidebar {
-  background-color: #FAF5F0 !important;
-  font-family: 'Plus Jakarta Sans' !important;
+  background-color: #faf5f0 !important;
+  font-family: "Plus Jakarta Sans" !important;
   color: #000000; /* texto claro na sidebar escura */
 }
 
 /* 7. Títulos e cabeçalhos — mantém Roboto e reforça cor de texto */
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Plus Jakarta Sans' !important;
-  color: #B06E2E;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Plus Jakarta Sans" !important;
+  color: #b06e2e;
+}
+
+.stHeading h1 {
+  padding-top: 0px;
+  padding-bottom: 5px;
 }
 
 /* 8. DataFrames e tabelas */
-.stDataFrameWrapper, .stTable {
-  background-color: #F9F4F5; /* tom claro para contraste com sidebar */
+.stDataFrameWrapper,
+.stTable {
+  background-color: #f9f4f5; /* tom claro para contraste com sidebar */
   border-radius: 8px;
   padding: 0.5rem;
   color: #000000;
-  font-family: 'Plus Jakarta Sans' !important;
+  font-family: "Plus Jakarta Sans" !important;
 }
 
 /* 9. Inputs, selects e áreas de texto */
-.stTextInput>div>div>input,
-.stSelectbox>div>div>div>div {
-  background-color: #F9F4F5 !important;
+.stTextInput > div > div > input,
+.stSelectbox > div > div > div > div {
+  background-color: #f9f4f5 !important;
   color: #000000 !important;
   font-size: 0.9rem;
   font-weight: 700;
   /* border: 1px solid #70587C !important; */
   border-radius: 4px !important;
-  font-family: 'Plus Jakarta Sans' !important;
+  font-family: "Plus Jakarta Sans" !important;
 }
 
 /* tab não selecionda */
@@ -90,59 +97,63 @@ h1, h2, h3, h4, h5, h6 {
 /* tab selecionada */
 /* Efeito de hover com transição suave */
 .stTabs [tabindex="0"] {
-    background-color: #F5E8DB !important;
-    color: #B06E2E;
-    border-radius: 10px 10px 0px 0px;
-    padding: 6px
-    /* border-radius: 4px !important; */
-    /* transition: all 0.3s ease !important; Transição suave */
-    /* display: inline-block !important; Para o hover funcionar corretamente */
+  background-color: #f5e8db !important;
+  color: #b06e2e;
+  border-radius: 10px 10px 0px 0px;
+  padding: 6px;
+  /* border-radius: 4px !important; */
+  /* transition: all 0.3s ease !important; Transição suave */
+  /* display: inline-block !important; Para o hover funcionar corretamente */
 }
 
 .stTabs p {
-  font-size: 1.25rem ;
-  color: #B06E2E;
-
+  font-size: 1.25rem;
+  color: #b06e2e;
 }
 
 /* Efeito ao passar o mouse */
 .stTabs button:hover {
-    background-color: #d38f4a18 !important; /* Cor mais clara no hover */
-    border-radius: 10px 10px 0px 0px;}
+  background-color: #d38f4a18 !important; /* Cor mais clara no hover */
+  border-radius: 10px 10px 0px 0px;
+}
 
 #op-ent {
   font-size: 1.15rem;
 }
-
 
 /* Efeito quando clicado (opcional) */
 /* .stTabs .st-h6:active {
     transform: translateY(0) !important;
     box-shadow: none !important;
 } */
-.stSelectbox  p {
-  color: #B06E2E;
+.stSelectbox p {
+  color: #b06e2e;
   font-size: 1.25rem;
 }
 
 /* 10. Rodapé e outros elementos menores */
-footer, .stMarkdown {
-  font-family: 'Plus Jakarta Sans' !important;
-  color: #B06E2E;
+footer,
+.stMarkdown {
+  font-family: "Plus Jakarta Sans" !important;
+  color: #b06e2e;
 }
 
-.stSelectbox div > div{
-  background-color: #F9F4F5;
+.stSelectbox div > div {
+  background-color: #f9f4f5;
 }
 
 .stButton > button {
   display: flex;
-  justify-content: flex-start;}
+  justify-content: flex-start;
+}
 
 .stApp > header {
   background-color: transparent;
-  color: #B06E2E;
+  color: #b06e2e;
+}
 
+.stMain > div {
+  padding-top: 5dvh;
 }
 
 .custom-header {
@@ -152,8 +163,37 @@ footer, .stMarkdown {
   top: 0;
   left: 0;
   width: 100%;
-  color: white;
-  padding: 10px 20px;
+  background-color: white;
+  padding: 5px 0px;
   z-index: 1000;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.custom-header h1 {
+  padding: 0px;
+}
+
+/* GIni Grafico circular  */
+
+.grafico {
+  --tamanho: 220px;
+  width: var(--tamanho);
+  height: var(--tamanho);
+}
+
+.grafico::before {
+  content: attr(data-value); /* Pega o valor do data-attribute */
+  display: grid;
+  place-items: center;
+  width: 70%;
+  height: 70%;
+  background: white;
+  border-radius: 50%;
+  font: bold 32px "Plus Jakarta Sans";
+  color: #0c0906;
+}
+
+
+.stSidebar img {
+  width: 150px;
+  height: 150px;
 }
