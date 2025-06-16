@@ -15,3 +15,6 @@ Aplicação Web de Análise e Visualização dos dados de concentração fundiá
 | RNF01 | O sistema deve ser responsivo, funcionando bem em desktops e dispositivos móveis. |
 | RNF02 | A aplicação deve carregar rapidamente gráficos e mapas (alta performance).        |
 | RNF03 | O código deve ser modular, claro e bem documentado.                               |
+
+
+

@@ -1,4 +1,5 @@
 # app.py
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -35,6 +36,10 @@ from modules import (
 
 )
 
+# Configurações
+DATA_SERVICE_URL = st.secrets.get("DATA_SERVICE_URL", "http://localhost:8000")
+MAX_FEATURES = 500  # Limite para features simultâneas
+
 st.set_page_config(
     page_title="ccTerra::Análise da Concentração Fundiária do Ceará",
     page_icon="🌿",
@@ -49,26 +54,24 @@ st.set_page_config(
 # Cacheia a leitura de CSVs e DataFrames pesados (expira em 1h)
 load_data = st.cache_resource(ttl=3600)(
     load_data
-)  # :contentReference[oaicite:2]{index=2} :contentReference[oaicite:3]{index=3}
+)
 
 # Cacheia validações e splits de dados (poupando re-execuções)
 validate_data = st.cache_resource()(
     validate_data
-)  # :contentReference[oaicite:4]{index=4}
+)
 
 # Cacheia filtros, classificações e estatísticas
 filtrar_dados = st.cache_resource()(filtrar_dados)
 classificar_propriedades = st.cache_resource()(classificar_propriedades)
 compute_stats_df = st.cache_resource()(
     compute_stats_df
-)  # :contentReference[oaicite:5]{index=5}
+)  
 
 # Cacheia GeoDataFrame de municípios e preparação de contexto
 load_municipios = st.cache_resource()(load_municipios)
 preparar_dados_ctx = st.cache_resource()(preparar_dados_ctx)
-# preprocessar_tudo = st.cache_resource()(
-#     preprocessar_tudo
-# )  # :contentReference[oaicite:6]{index=6}
+
 
 # -----------------------------
 # 🚀 App Streamlit
@@ -78,6 +81,32 @@ preparar_dados_ctx = st.cache_resource()(preparar_dados_ctx)
 # 0) Definição de funções de visualizações
 # ---------------------------------------------------
 
+DATA_FOLDER = "data/"
+
+
+@st.cache_resource
+def load_once():
+
+    df_raw = load_data(DATA_FOLDER)
+    return validate_data(df_raw)
+
+
+# Carrega e valida dados
+
+# start = time.time() # Teste de tempo de carga
+
+    """
+    Carrega e valida dados
+      - df_all   : DataFrame completo com dados fundiários de todos os municípios do ceará
+      - df_class : DataFrame com a classificação de propriedades de todo o ceará
+      - gdf_inter: GeoDataFrame pronto para mapa interativo pois contém as informações de geometria as propriedades
+      - df_ctx   : DataFrame para mapa contextual
+      - counts   : dict de totais e descartados
+    """
+
+df_all, df_class, df_inter, df_ctx, counts = load_once()
+
+######################### Gráficos de Tabelas Gerais do Estado #########################
 
 def graficos_e_quadros():
     col1, col2 = st.columns([3, 2])
@@ -128,7 +157,11 @@ def graficos_e_quadros():
         st.warning("Nenhum dado disponível para o filtro selecionado.")
 
 
-@st.cache_resource
+
+
+######################### Mapa Contextual #########################
+
+# @st.cache_resource
 def test():
     muni_gdf = load_municipios(DATA_FOLDER)
     gdf_ctx = preparar_dados_ctx(df_ctx, muni_gdf)
@@ -158,7 +191,7 @@ def mapa_contextuall():
             returned_objects=["last_clicked"],  # Só retorna o necessário
         )
 
-
+######################### Mapa Interativo da Malha Fundiária #########################
 def mapa_interativo():
     def simplify_geojson(geojson_data, tolerance=0.001):
         if not geojson_data or not geojson_data.get("features"):
@@ -178,8 +211,6 @@ def mapa_interativo():
                 return [lat, lng]
         return [-5.2, -39.0]
 
-    # st.set_page_config(page_title="Mapa Fundiário Interativo", layout="wide")
-    # st.title("Mapa Fundiário Interativo do Ceará")
 
     CORES = {
         "Pequena Propriedade < 1 MF": "#fecc5c",
@@ -285,6 +316,8 @@ def mapa_interativo():
         st.stop()
 
 
+######################### Mapa de Gini do Estado #########################
+
 def mapa_gini():
     @st.cache_data
     def load_data_gini():
@@ -363,8 +396,7 @@ def mapa_gini():
         municipios["nome_municipio"] = municipios["NM_MUN"].apply(normalizar_nome)
         return municipios.rename(columns={"nome_municipio": "nome_municipio"})
 
-    # Uso:
-
+    
     def contar_lotes(df_with, df_no):
         """Conta lotes por município e identifica warnings"""
 
@@ -375,12 +407,11 @@ def mapa_gini():
 
         return df_with, df_no, warning_munis
 
-    # USO:
+    
     df_with, df_no = processar_dataframes(df_props, out_iqr, out_err)
     df_with = normalizar_df(df_with)
     df_no = normalizar_df(df_no)
     muni_geo = normalizar_municipios(municipios)
-    # muni_geo = normalizar_nomes([df_with, df_no], municipios)
     df_with, df_no, warning_munis = contar_lotes(df_with, df_no)
 
     # Geração DataFrame de Gini por município
@@ -536,6 +567,7 @@ def mapa_gini():
             m.get_root().html.add_child(folium.Element(legend_html))
             st_folium(m, width=1100, height=800)
 
+######################### Estrutura Geral de Navegação #########################
     # Renderiza mapas
     render_map(col1, geo_with)
 
@@ -695,21 +727,6 @@ with st.sidebar:
 
     if st.button("Sobre", use_container_width=True, icon=":material/info:"):
         st.session_state.current_page = "Sobre"
-
-DATA_FOLDER = "data/"
-
-
-@st.cache_resource
-def load_once():
-
-    df_raw = load_data(DATA_FOLDER)
-    return validate_data(df_raw)
-
-
-# Carrega e valida dados
-start = time.time()
-
-df_all, df_class, df_inter, df_ctx, counts = load_once()
 
 
 # ---------------------------------------------------

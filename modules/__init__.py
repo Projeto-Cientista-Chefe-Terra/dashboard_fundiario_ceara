@@ -1,5 +1,6 @@
+# modules/__init__.py
+
 from .data_loader import (
-    get_latest_dataset,
     load_csv_data,
     load_municipios,
     validate_data
@@ -20,9 +21,30 @@ from .mapa_contextual import (
 #     criar_mapa_com_camadas
 # )
 
+# Version of the modules package
+__version__ = "1.0.0"
+
+# API configuration (can be overridden by users)
+DATA_SERVICE_URL = "http://localhost:8000"
+
 __all__ = [
-    "get_latest_dataset", "load_csv_data", "load_municipios", "validate_data",
-    "filtrar_dados", "classificar_propriedades", "plot_barras", "plot_pizza", "compute_stats_df",
-    "preparar_dados", "criar_choropleth_contextual",
-    "preprocessar_tudo", "criar_mapa_com_camadas"
+    # Data loading and validation
+    "load_csv_data", 
+    "load_municipios", 
+    "validate_data",
+    
+    # Interactive chart functions
+    "filtrar_dados", 
+    "classificar_propriedades", 
+    "plot_barras", 
+    "plot_pizza", 
+    "compute_stats_df",
+    
+    # Contextual map functions
+    "preparar_dados", 
+    "criar_mapa_contextual",
+    
+   
+    # Configuration
+    "DATA_SERVICE_URL"
 ]

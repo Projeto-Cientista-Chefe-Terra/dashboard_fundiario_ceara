@@ -1,161 +1,125 @@
 # modules/data_loader.py
 
 import os
+import requests
 import streamlit as st
 import pandas as pd
 import geopandas as gpd
 import numpy as np
-from shapely import wkt
-import unicodedata
+from shapely.geometry import shape
+from typing import Dict, List, Any, Optional
+from concurrent.futures import ThreadPoolExecutor
 
-_DATA_PREFIX    = 'dataset-malha-fundiaria-idace_preprocessado-'
-_DATA_SUFFIX    = '.csv'
-_MUNI_GEOJSON   = 'geojson-municipios_ceara-normalizado.geojson'
+# Configuração ajustável da API
+DATA_SERVICE_URL = st.secrets.get("DATA_SERVICE_URL", "http://localhost:8000")
+REQUEST_TIMEOUT = 30  # segundos
+MAX_WORKERS = 4  # Para requests paralelos
 
-@st.cache_data
-def get_latest_dataset(base_folder: str) -> str:
-    files = [f for f in os.listdir(base_folder)
-             if f.startswith(_DATA_PREFIX) and f.endswith(_DATA_SUFFIX)]
-    if not files:
-        raise FileNotFoundError(f"Nenhum dataset encontrado em {base_folder}")
-    files.sort()
-    return os.path.join(base_folder, files[-1])
+@st.cache_data(ttl=86400)  # Cache de 24h para dados estáticos
+def _fetch_from_api(endpoint: str, params: Optional[Dict] = None) -> Any:
+    """Helper function otimizado para fetch de dados"""
+    try:
+        response = requests.get(
+            f"{DATA_SERVICE_URL}/{endpoint}",
+            params=params,
+            timeout=REQUEST_TIMEOUT
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        st.error(f"Erro ao acessar API: {str(e)}")
+        raise
 
-@st.cache_data
+@st.cache_data(ttl=3600)  # Cache de 1h para dados regionais
+def _fetch_regiao_data(regiao: str) -> List[Dict]:
+    """Busca dados de uma região específica com tratamento de erro"""
+    try:
+        return _fetch_from_api("dados_fundiarios", {"regiao": regiao})
+    except:
+        return []
+
+@st.cache_data(ttl=3600)
 def load_csv_data(base_folder: str) -> pd.DataFrame:
-    """
-    Lê o CSV mais recente, faz as conversões e classifica cada parcela
-    em 'categoria', retornando um DataFrame com colunas:
-    ['modulo_fiscal','area','geometry','nome_municipio',
-     'regiao_administrativa','municipio_norm','categoria']
-    """
-    path = get_latest_dataset(base_folder)
-    df   = pd.read_csv(path, low_memory=False)
-
-    for col in ['modulo_fiscal','area','geom','nome_municipio','regiao_administrativa']:
-        if col not in df.columns:
-            raise KeyError(f"Coluna obrigatória '{col}' não encontrada.")
-
-    df['modulo_fiscal'] = df['modulo_fiscal'].astype(float)
-    df['area']          = df['area'].astype(float)
-
-    df = df[df['geom'].notna()].copy()
-    df['geometry'] = df['geom'].apply(wkt.loads)
-
-    # normaliza nome do município
-    df['municipio_norm'] = df['nome_municipio'].apply(
-        lambda s: unicodedata.normalize('NFKD', s)
-                         .encode('ASCII','ignore')
-                         .decode().lower()
-    )
-
-    # classifica propriedade
-    mf   = df['modulo_fiscal']
-    area = df['area']
-    df['categoria'] = np.where(
-        area < mf, 'Pequena Propriedade < 1 MF',
-        np.where(area <= 4*mf, 'Pequena Propriedade',
-        np.where(area <=15*mf, 'Média Propriedade','Grande Propriedade'))
-    )
-
+    """Carrega dados de forma otimizada com paralelismo"""
+    # Busca regiões (cache longo)
+    regions = _fetch_from_api("regioes")["regioes"]
+    
+    # Busca paralela por região
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        all_data = []
+        for data in executor.map(_fetch_regiao_data, regions):
+            all_data.extend(data)
+    
+    # Cria DataFrame otimizado
+    df = pd.DataFrame(all_data, columns=[
+        'numero_lote', 'numero_incra', 'situacao_juridica',
+        'modulo_fiscal', 'area', 'nome_municipio',
+        'regiao_administrativa'
+    ])
+    
+    # Tipos específicos para economizar memória
+    df['modulo_fiscal'] = pd.to_numeric(df['modulo_fiscal'], errors='coerce')
+    df['area'] = pd.to_numeric(df['area'], errors='coerce')
+    df['municipio_norm'] = df['nome_municipio'].str.lower().astype('category')
+    
     return df
 
-@st.cache_resource
+@st.cache_resource(ttl=86400)
 def load_municipios(base_folder: str) -> gpd.GeoDataFrame:
-    """
-    Lê o GeoJSON de municípios, detecta primeiro 'NM_MUN' e, se não achar,
-    qualquer coluna que contenha 'nm' e 'mun', renomeia-a para 'nome_municipio'
-    e adiciona muni['municipio_norm'].
-    """
-    path = os.path.join(base_folder, _MUNI_GEOJSON)
-    muni = gpd.read_file(path)
+    """Carrega municípios com geometrias simplificadas"""
+    # Busca lista de municípios (cache longo)
+    muni_list = _fetch_from_api("municipios_todos")["municipios"]
+    
+    # Busca geometrias com parâmetro de simplificação
+    features = []
+    for muni in muni_list[:50]:  # Limite para teste - ajustar conforme necessário
+        try:
+            geojson = _fetch_from_api(
+                "geojson_muni", 
+                {"municipio": muni, "tolerance": 0.01}
+            )
+            features.extend(geojson["features"])
+        except:
+            continue
+    
+    # Cria GeoDataFrame otimizado
+    gdf = gpd.GeoDataFrame.from_features(features, crs="EPSG:4326")
+    
+    # Normaliza colunas
+    if 'nm_mun' in gdf.columns:
+        gdf = gdf.rename(columns={'nm_mun': 'nome_municipio'})
+    gdf['municipio_norm'] = gdf['nome_municipio'].str.lower().astype('category')
+    
+    return gdf[['nome_municipio', 'municipio_norm', 'geometry']]
 
-    # tenta achar coluna exata 'NM_MUN'
-    col_muni = next((c for c in muni.columns if c.lower() == 'nm_mun'), None)
-    # senão, qualquer 'nm' + 'mun'
-    if col_muni is None:
-        col_muni = next((c for c in muni.columns
-                         if 'nm' in c.lower() and 'mun' in c.lower()), None)
-    if col_muni is None:
-        raise KeyError(f"Nenhuma coluna de município encontrada em: {muni.columns.tolist()}")
-
-    muni = muni.rename(columns={col_muni: 'nome_municipio'})
-    muni['municipio_norm'] = muni['nome_municipio'].apply(
-        lambda s: unicodedata.normalize('NFKD', s)
-                         .encode('ASCII','ignore')
-                         .decode().lower()
-    )
-    return muni.to_crs(epsg=4326)
-
-
-# def validate_data(df: pd.DataFrame):
-#     """
-#     Recebe o df completo (com geometry e categoria) e retorna:
-#       - df_all   (tudo)
-#       - df_class (válidos para classificação)
-#       - df_inter (GeoDataFrame para mapa interativo)
-#       - df_ctx   (válidos para mapa contextual)
-#       - counts   (dicionário de totais e descartados)
-#     """
-#     total       = len(df)
-#     df_class    = df.dropna(subset=['modulo_fiscal','area'])
-#     # criar GeoDataFrame para mapa interativo
-#     df_inter    = df_class.dropna(subset=['geometry']).copy()
-#     df_inter    = gpd.GeoDataFrame(df_inter, geometry='geometry', crs='EPSG:4326')
-#     df_ctx      = df_class.dropna(subset=['municipio_norm'])
-
-#     counts      = {
-#         'total_carregados':       total,
-#         'validos_classificacao': len(df_class),
-#         'validos_mapa_interativo': len(df_inter),
-#         'validos_mapa_contextual': len(df_ctx),
-#         'descartados':            total - len(df_class)
-#     }
-#     return df, df_class, df_inter, df_ctx, counts
 @st.cache_resource
-def validate_data(df: pd.DataFrame):
-    """
-    Recebe DataFrame de load_csv_data e retorna:
-      - df_all   : DataFrame completo
-      - df_class : DataFrame filtrado para classificação
-      - gdf_inter: GeoDataFrame pronto para mapa interativo
-      - df_ctx   : DataFrame para mapa contextual
-      - counts   : dict de totais e descartados
-    """
-    total = len(df)
-
-    # 1) Filtra entradas com area e modulo_fiscal
+def validate_data(df: pd.DataFrame) -> tuple:
+    """Versão otimizada da validação de dados"""
+    # Filtra dados inválidos
     df_class = df.dropna(subset=['modulo_fiscal', 'area']).copy()
-
-    # 2) Prepara GeoDataFrame para o mapa interativo
-    df_inter = df_class.copy()
-    # Converte WKT → shapely geometry
-    df_inter['geometry'] = df_inter['geom'].apply(lambda w: wkt.loads(w) if pd.notna(w) else None)
-    df_inter = df_inter.dropna(subset=['geometry'])
-    # Monta GeoDataFrame e projeta para WGS84
-    gdf_inter = gpd.GeoDataFrame(df_inter, geometry='geometry', crs='EPSG:31984')
-    gdf_inter = gdf_inter.to_crs(epsg=4326)
-
-    # 3) Classifica categorias direto no GeoDataFrame
-    conds = [
-        (gdf_inter['area'] > 0) & (gdf_inter['area'] < gdf_inter['modulo_fiscal']),
-        (gdf_inter['area'] >= gdf_inter['modulo_fiscal']) & (gdf_inter['area'] <= 4 * gdf_inter['modulo_fiscal']),
-        (gdf_inter['area'] > 4 * gdf_inter['modulo_fiscal']) & (gdf_inter['area'] <= 15 * gdf_inter['modulo_fiscal']),
-        (gdf_inter['area'] > 15 * gdf_inter['modulo_fiscal'])
+    
+    # Pré-classificação sem geometria
+    conditions = [
+        (df_class['area'] < df_class['modulo_fiscal']),
+        (df_class['area'] <= 4 * df_class['modulo_fiscal']),
+        (df_class['area'] <= 15 * df_class['modulo_fiscal']),
+        (df_class['area'] > 15 * df_class['modulo_fiscal'])
     ]
-    cats = ['Pequena Propriedade < 1 MF', 'Pequena Propriedade', 'M\u00e9dia Propriedade', 'Grande Propriedade']
-    gdf_inter['categoria'] = np.select(conds, cats, default='Sem Classificação')
-
-    # 4) Prepara dados para o mapa contextual
-    df_ctx = df_class.dropna(subset=['municipio_norm']).copy()
-
-    # 5) Contagens de validação
+    choices = [
+        'Pequena Propriedade < 1 MF',
+        'Pequena Propriedade', 
+        'Média Propriedade',
+        'Grande Propriedade'
+    ]
+    df_class['categoria'] = np.select(conditions, choices, default='Sem Classificação')
+    
+    # Contagens básicas
     counts = {
-        'total_carregados': total,
+        'total_carregados': len(df),
         'validos_classificacao': len(df_class),
-        'validos_mapa_interativo': len(gdf_inter),
-        'validos_mapa_contextual': len(df_ctx),
-        'descartados': total - len(df_class)
+        'validos_mapa_contextual': df_class['nome_municipio'].notna().sum(),
+        'descartados': len(df) - len(df_class)
     }
-
-    return df, df_class, gdf_inter, df_ctx, counts
+    
+    # Retorna sem geometrias para mapas interativos (serão carregados sob demanda)
+    return df, df_class, None, df_class.dropna(subset=['nome_municipio']), counts

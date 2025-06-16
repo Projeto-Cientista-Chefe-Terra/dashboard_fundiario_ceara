@@ -6,3 +6,4 @@ geopandas
 folium
 matplotlib
 shapely
+requests

@@ -1,10 +1,14 @@
 [server]
-headless              = false
-enableCORS            = true
-port                  = 5000
-address               = "0.0.0.0"
-enableXsrfProtection  = false
-runOnSave             = true
+maxUploadSize = 200
+maxMessageSize = 200
+enableCORS = false
+headless = true
+enableXsrfProtection = false
+runOnSave = true
+port = 8501
+fileWatcherType = "auto"
+enableWebsocketCompression = false
+disconnectedSessionTTL = 120
 
 [theme]
 base                     = "light"
@@ -13,7 +17,4 @@ backgroundColor          = "#FFFFFF"
 secondaryBackgroundColor = "#FAF5F0"
 textColor                = "#000000"
 font                     = "sans serif"
-
-[logger]
-level = "info"
 
