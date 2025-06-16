@@ -193,15 +193,18 @@ def mapa_interativo():
     if not regioes:
         st.error("Erro ao carregar regiões.")
         st.stop()
-    regiao = st.selectbox("Selecione a região administrativa", regioes)
+    
+    col1, col2 = st.columns([3,2])
+
+    regiao = col2.selectbox("Selecione a região administrativa", regioes)
 
     municipios = fetch_municipios(regiao)
-    municipio = st.selectbox("Selecione o município (opcional)", ["(toda a região)"] + municipios)
+    municipio = col2.selectbox("Selecione o município (opcional)", ["(toda a região)"] + municipios)
 
 
 
 
-    if st.button("Gerar Mapa"):
+    if col2.button("Gerar Mapa"):
         try:
             if municipio == "(toda a região)":
                 geojson_data = fetch_geojson_por_regiao(regiao)
@@ -273,11 +276,12 @@ def mapa_interativo():
             ).add_to(fg)
             fg.add_to(m)
 
-
-        with st.spinner("Gerando mapa..."):
-            folium.LayerControl(collapsed=False).add_to(m)
-            Fullscreen().add_to(m)
-            st_folium(m, width=1200, height=900, returned_objects=[])
+        with col1:
+            with st.spinner("Gerando mapa..."):
+                folium.LayerControl(collapsed=False).add_to(m)
+                Fullscreen().add_to(m)
+                st_folium(m, width=1200, height=900, returned_objects=[])
+            
         st.stop()
 
 
