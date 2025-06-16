@@ -84,9 +84,7 @@ def graficos_e_quadros():
     entidade = None
     if opcao != "Todo o Estado":
         col = "nome_municipio" if opcao == "Municípios" else "regiao_administrativa"
-        entidade = co2_2.selectbox(
-            f"{opcao}:", sorted(df_class[col].dropna().unique())
-        )
+        entidade = co2_2.selectbox(f"{opcao}:", sorted(df_class[col].dropna().unique()))
 
     df_filtrado = filtrar_dados(df_class, opcao, entidade)
     resultados, total = classificar_propriedades(df_filtrado)
@@ -453,6 +451,63 @@ def mapa_gini():
     # Gini estadual e notas
 
 
+def sobre():
+    st.markdown(
+        """
+    Aplicação de painéis contendo dados estatísticos e geoespaciais da malha fundiária cearense desenvolvido, principalmente, a partir dos dados cadastrados no Instituto de Desenvolvimento Agrário do Ceará (IDACE). Este software faz parte das ações realizadas no âmbito do projeto **Cientista Chefe Terra  de Governança Fundiária e Ambiental**, parceria entre o IDACE, a Universidade Federal do Ceará (UFC) e a Fundação Cearense de Apoio ao Desenvolvimento Científico e Tecnológico (Funcap).
+    """
+    )
+
+    # Coordenadora Geral
+    st.markdown(
+        """
+    **Coordenadora Geral**  
+    Profa. Maria Inês Escobar da Costa (EcoEco-UFC)
+    """
+    )
+
+    # Equipe de Desenvolvimento
+    st.subheader("Equipe de Desenvolvimento")
+    st.markdown(
+        """
+    Nossa equipe é composta por:
+    - Prof. Wellington Wagner Ferreira Sarmento (SMD-UFC)
+    - Me. Patrícia de Sousa Paula (Doutoranda MDCC-UFC)
+    - André Lucas de Oliveira Domingues (SMD-UFC)
+    - Wesley Barbosa Martins Ribeiro (SMD-UFC)
+    """
+    )
+
+    # Licença de Uso
+    st.subheader("Licença de Uso")
+    st.markdown(
+        """
+    [GNU General Public License (GPL)](https://github.com/Projeto-Cientista-Chefe-Terra/dashboard_fundiario_ceara/blob/main/LICENSE)
+    """
+    )
+
+    # Link para o projeto
+    st.header("Cientista Chefe Terra de Governança Fundiária e Ambiental")
+    st.markdown("#### Código Fonte")
+    st.markdown("https://github.com/Projeto-Cientista-Chefe-Terra")
+
+    st.header("Apoio")
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.image("./assets/ufc_logo.png", width=150)
+        
+
+    with col2:
+        st.image("./assets/funcap.png", width=150)
+
+
+    with col3:
+        st.image("./assets/Idace.png", width=150)
+        
+
+
+
 # ---------------------------------------------------
 # 1) set_page_config deve ser o primeiro comando do Streamlit
 # ---------------------------------------------------
@@ -485,8 +540,12 @@ with st.sidebar:
         st.session_state.current_page = "Mapa Contextual"
     if st.button("Mapa Interativo", use_container_width=True, icon=":material/map:"):
         st.session_state.current_page = "Mapa Interativo"
+
     if st.button("Mapa Gini", use_container_width=True, icon=":material/crisis_alert:"):
         st.session_state.current_page = "Mapa Gini"
+
+    if st.button("Sobre", use_container_width=True, icon=":material/info:"):
+        st.session_state.current_page = "Sobre"
 
 DATA_FOLDER = "data/"
 
@@ -524,6 +583,10 @@ elif st.session_state.current_page == "Mapa Contextual":
 elif st.session_state.current_page == "Mapa Gini":
     st.title("Mapa Gini")
     mapa_gini()
+
+elif st.session_state.current_page == "Sobre":
+    st.title("Sobre")
+    sobre()
 
 else:  # Mapa Interativo
     st.title("Mapa Interativo")
