@@ -1,0 +1,13 @@
+@startuml AtividadesCSV
+title Atividades de Visualização e Filtragem CSV
+
+start
+:Usuário acessa aplicação;
+:Escolhe visualização (Mapa ou Gráfico);
+:Seleciona filtros (Município, categoria);
+:Carrega dados do CSV;
+:Processa dados filtrados;
+:Gera mapa ou gráfico;
+:Exibe resultado para usuário;
+stop
+@enduml

@@ -1,0 +1,34 @@
+@startuml ClassesCSV
+title Diagrama de Classes - CSV
+
+class StreamlitApp {
+  +exibirMapa()
+  +exibirGraficos()
+  +exibirSobre()
+}
+
+class CSVReader {
+  +carregarDados()
+}
+
+class DataProcessing {
+  +filtrarDados()
+  +processarDados()
+}
+
+class VisualMapas {
+  +gerarMapaInterativo()
+}
+
+class VisualGraficos {
+  +gerarGraficoBarra()
+  +gerarGraficoPizza()
+}
+
+StreamlitApp --> VisualMapas
+StreamlitApp --> VisualGraficos
+VisualMapas --> DataProcessing
+VisualGraficos --> DataProcessing
+DataProcessing --> CSVReader
+CSVReader --> "dados_fundiarios.csv"
+@enduml

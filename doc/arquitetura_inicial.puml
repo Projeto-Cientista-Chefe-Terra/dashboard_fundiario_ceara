@@ -1,0 +1,19 @@
+@startuml ArquiteturaCSV
+title Arquitetura Inicial com CSV
+
+actor Usuario
+
+package "Frontend Streamlit" {
+    [Streamlit App] --> (Página de Mapas)
+    [Streamlit App] --> (Página de Gráficos)
+    [Streamlit App] --> (Página Sobre)
+}
+
+package "Backend CSV" {
+    (Página de Mapas) --> (csv_reader.py)
+    (Página de Gráficos) --> (csv_reader.py)
+    (csv_reader.py) --> (dados_fundiarios.csv)
+}
+
+Usuario --> [Streamlit App]
+@enduml

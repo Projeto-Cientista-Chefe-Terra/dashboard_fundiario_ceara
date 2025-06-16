@@ -1,0 +1,96 @@
+@startuml
+title **Arquitetura do Sistema Fundiário**  
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+
+skinparam component {
+  Style uml2
+  BorderColor #333333
+  BackgroundColor<<FRONTEND>> #CCF
+  BackgroundColor<<BACKEND>> #FFC
+  BackgroundColor<<DADOS>> #CFC
+  BackgroundColor<<EXTERNO>> #F8F8F8
+}
+
+left to right direction
+
+actor "Usuário" <<Person>> as user #white
+
+package "Frontend" <<FRONTEND>> {
+  component "Aplicação Streamlit" as frontend {
+    [Página de Mapas] as mapa
+    [Página de Gráficos] as grafico
+    [Login Gov.br] as login
+  }
+}
+
+package "Backend" <<BACKEND>> {
+  component "Data Provider" as dataprovider {
+    [CSV Handler] as csv
+    [GeoServer Client] as geoclient
+  }
+  
+  component "Autenticação" as auth {
+    [Gov.br OAuth] as oauth
+  }
+}
+
+package "Infraestrutura" <<EXTERNO>> {
+  component "GeoServer" as geoserver {
+    [WMS/WFS] as wms
+  }
+  
+  database "PostGIS" as postgis #white
+  cloud "Gov.br API" as govbr_api #white
+}
+
+package "Integração de Dados" <<DADOS>> {
+  component "ETL IDACE" as idace {
+    [API Client] as api_idace
+  }
+  
+  component "Coleta INCRA" as incra {
+    [Scraper] as scraper
+  }
+}
+
+' Fluxo principal
+user -> frontend
+frontend --> dataprovider
+frontend --> auth
+
+dataprovider --> geoserver
+geoclient --> wms
+wms -> postgis
+csv -> postgis
+
+auth --> govbr_api
+
+idace --> postgis
+incra --> postgis
+api_idace --> idace
+scraper --> incra
+
+' Notas técnicas
+note right of geoserver
+  <b>Serviços OGC:</b>
+  • WMS (Visualização)
+  • WFS (Dados brutos)
+end note
+
+note left of incra
+  <b>Processo:</b>
+  • Coleta automatizada
+  • Limpeza de dados
+end note
+
+legend bottom
+  | Camada          | Descrição               |
+  | **Frontend**    | Interface do usuário    |
+  | **Backend**     | Lógica de aplicação     |
+  | **Dados**       | Processamento ETL       |
+  | **Infra**       | Serviços externos       |
+end legend
+
+@enduml

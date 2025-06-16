@@ -1,0 +1,10 @@
+@startuml CasosDeUsoCSV
+title Diagrama de Casos de Uso - CSV
+
+actor Usuario
+
+Usuario --> (Visualizar Mapa Interativo)
+Usuario --> (Visualizar Gráficos Interativos)
+Usuario --> (Filtrar por Município)
+Usuario --> (Obter detalhes de propriedades)
+@enduml

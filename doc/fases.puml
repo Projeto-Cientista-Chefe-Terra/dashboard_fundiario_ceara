@@ -1,0 +1,49 @@
+@startuml
+title Diagrama de Componentes - Evolução do Sistema Fundiário
+
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam componentStyle uml2
+
+left to right direction
+
+actor Usuário as user
+
+component "Fase 1: Prototipagem" <<Fase1>> #E6F3FF {
+    [Interface CSV] as csv
+    [Visualizador] as vis
+    [Testes] as test
+}
+
+component "Fase 2: Integração" <<Fase2>> #FFF2CC {
+    [ETL] as etl
+    [GeoServer] as gs
+    [Frontend Geo] as fe
+}
+
+component "Fase 3: Produção" <<Fase3>> #E2EFDA {
+    [Autenticação] as auth
+    [Controle Acesso] as ca
+    [Deploy] as deploy
+}
+
+' Conexões
+user --> csv
+csv --> vis
+vis --> test
+test --> etl
+etl --> gs
+gs --> fe
+fe --> auth
+auth --> ca
+ca --> deploy
+
+' Legenda das fases
+legend right
+  |Fase 1 | Prototipagem |
+  |Fase 2 | Integração |
+  |Fase 3 | Produção |
+end legend
+
+@enduml
