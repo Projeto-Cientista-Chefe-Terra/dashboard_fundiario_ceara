@@ -15,10 +15,10 @@ from .mapa_contextual import (
     preparar_dados,
     criar_mapa_contextual
 )
-from .mapa_interativo import (
-    preprocessar_tudo,
-    criar_mapa_com_camadas
-)
+# from .mapa_interativo import (
+#     preprocessar_tudo,
+#     criar_mapa_com_camadas
+# )
 
 __all__ = [
     "get_latest_dataset", "load_csv_data", "load_municipios", "validate_data",

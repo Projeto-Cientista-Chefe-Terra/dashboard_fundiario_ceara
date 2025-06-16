@@ -6,12 +6,19 @@ from streamlit_folium import st_folium
 import geopandas as gpd
 import unicodedata
 import folium
+import json
+from folium.plugins import Fullscreen
 import os
 import time
 from datetime import datetime
 from folium.features import GeoJsonTooltip
 from shapely.geometry import Polygon, MultiPolygon
 
+from modules.data_loader_aux import (
+    fetch_regioes, fetch_municipios,
+    fetch_geojson_por_regiao, fetch_geojson_por_municipio,
+    fetch_geojson_limites
+)
 
 from modules import (
     load_csv_data as load_data,
@@ -25,8 +32,7 @@ from modules import (
     load_municipios,
     preparar_dados as preparar_dados_ctx,
     criar_mapa_contextual,
-    preprocessar_tudo,
-    criar_mapa_com_camadas,
+
 )
 
 st.set_page_config(
@@ -60,9 +66,9 @@ compute_stats_df = st.cache_resource()(
 # Cacheia GeoDataFrame de municípios e preparação de contexto
 load_municipios = st.cache_resource()(load_municipios)
 preparar_dados_ctx = st.cache_resource()(preparar_dados_ctx)
-preprocessar_tudo = st.cache_resource()(
-    preprocessar_tudo
-)  # :contentReference[oaicite:6]{index=6}
+# preprocessar_tudo = st.cache_resource()(
+#     preprocessar_tudo
+# )  # :contentReference[oaicite:6]{index=6}
 
 # -----------------------------
 # 🚀 App Streamlit
@@ -154,11 +160,125 @@ def mapa_contextuall():
 
 
 def mapa_interativo():
-    sel_regiao = st.sidebar.selectbox(
-        "Região Administrativa", sorted(df_inter["regiao_administrativa"].unique())
-    )
-    mapa = criar_mapa_com_camadas(df_inter, sel_regiao)
-    st_folium(mapa, width=800, height=600)
+    def simplify_geojson(geojson_data, tolerance=0.001):
+        if not geojson_data or not geojson_data.get("features"):
+            return geojson_data
+        gdf = gpd.GeoDataFrame.from_features(geojson_data["features"])
+        gdf["geometry"] = gdf["geometry"].simplify(tolerance)
+        return json.loads(gdf.to_json())
+
+    def get_map_center(geojson):
+        for f in geojson["features"]:
+            g = f["geometry"]
+            if g["type"] == "Polygon":
+                lng, lat = g["coordinates"][0][0]
+                return [lat, lng]
+            elif g["type"] == "MultiPolygon":
+                lng, lat = g["coordinates"][0][0][0]
+                return [lat, lng]
+        return [-5.2, -39.0]
+
+    # st.set_page_config(page_title="Mapa Fundiário Interativo", layout="wide")
+    # st.title("Mapa Fundiário Interativo do Ceará")
+
+    CORES = {
+        "Pequena Propriedade < 1 MF": "#fecc5c",
+        "Pequena Propriedade": "#fd8d3c",
+        "Média Propriedade": "#f03b20",
+        "Grande Propriedade": "#bd0026",
+        "Sem Classificação": "#eeeee4"
+    }
+
+    regioes = fetch_regioes()
+    if not regioes:
+        st.error("Erro ao carregar regiões.")
+        st.stop()
+    regiao = st.selectbox("Selecione a região administrativa", regioes)
+
+    municipios = fetch_municipios(regiao)
+    municipio = st.selectbox("Selecione o município (opcional)", ["(toda a região)"] + municipios)
+
+
+
+
+    if st.button("Gerar Mapa"):
+        try:
+            if municipio == "(toda a região)":
+                geojson_data = fetch_geojson_por_regiao(regiao)
+                boundaries = []
+                for m in municipios:
+                    b = fetch_geojson_limites(m)
+                    if b and b.get("features"):
+                        boundaries.extend(b["features"])
+                boundary_geojson = {"type":"FeatureCollection", "features":boundaries} if boundaries else None
+            else:
+                geojson_data = fetch_geojson_por_municipio(municipio)
+                boundary_geojson = fetch_geojson_limites(municipio)
+        except Exception as e:
+            st.error(f"Erro ao baixar dados: {e}")
+            st.stop()
+
+        if not geojson_data or not geojson_data.get("features"):
+            st.warning("Nenhuma geometria encontrada.")
+            st.stop()
+
+        geojson_data = simplify_geojson(geojson_data)
+        center = get_map_center(geojson_data)
+
+        m = folium.Map(location=center, zoom_start=9, tiles=None, control_scale=True)
+
+        folium.TileLayer(
+            # tiles='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            # attr='© OpenStreetMap contributors',
+            tiles = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+            attr = '© OpenStreetMap contributors, © CARTO',
+            name='OpenpenStreetMap',
+            control=False,  # para não aparecer no LayerControl
+            overlay=True
+        ).add_to(m)
+
+
+        if boundary_geojson and boundary_geojson.get("features"):
+            folium.GeoJson(
+                boundary_geojson,
+                name='<span><svg width="12" height="12"><rect width="12" height="12" fill="#003366"/></svg> Limites Municipais</span>',
+                style_function=lambda x: {
+                    'color': '#003366', 'weight': 2, 'opacity': 0.8,
+                    'fill': False, 'dashArray': '5, 5'
+                },
+                tooltip=folium.GeoJsonTooltip(fields=['nome_municipio'], aliases=['Município:'])
+            ).add_to(m)
+
+        for categoria, cor in CORES.items():
+            feats = [f for f in geojson_data["features"]
+                    if f.get("properties", {}).get("categoria", "Sem Classificação") == categoria]
+            if not feats:
+                continue
+            cat_geojson = {"type": "FeatureCollection", "features": feats}
+            name_html = (
+                f'<span><svg width="12" height="12">'
+                f'<circle cx="6" cy="6" r="6" fill="{cor}" /></svg> {categoria}</span>'
+            )
+            fg = folium.FeatureGroup(name=name_html, overlay=True, control=True)
+            folium.GeoJson(
+                cat_geojson,
+                style_function=lambda x, cor=cor: {
+                    'fillColor': cor, 'color': '#000', 'weight': 0.5, 'fillOpacity': 0.6
+                },
+                tooltip=folium.GeoJsonTooltip(
+                    fields=['nome_municipio', 'area', 'categoria'],
+                    aliases=['Município:', 'Área (ha):', 'Categoria:'],
+                    localize=True
+                )
+            ).add_to(fg)
+            fg.add_to(m)
+
+
+        with st.spinner("Gerando mapa..."):
+            folium.LayerControl(collapsed=False).add_to(m)
+            Fullscreen().add_to(m)
+            st_folium(m, width=1200, height=900, returned_objects=[])
+        st.stop()
 
 
 def mapa_gini():
@@ -459,9 +579,9 @@ def sobre():
     )
 
     # Coordenadora Geral
+    st.subheader("Coordenadora Geral")
     st.markdown(
-        """
-    **Coordenadora Geral**  
+        """    
     Profa. Maria Inês Escobar da Costa (EcoEco-UFC)
     """
     )
@@ -506,6 +626,25 @@ def sobre():
         st.image("./assets/Idace.png", width=150)
         
 
+def mapa_hidrográfico():
+    centro = [-5.4984, -39.3200]
+    mapa = folium.Map(location=centro, zoom_start=7)
+    map_container = st.empty()
+    st.session_state.mapa_obj = mapa
+
+    # Camada 3 - Exibição
+    with map_container:
+        st_folium(
+            st.session_state.mapa_obj,
+            key=f"ctx_map_v",
+            width=900,
+            height=600,
+            returned_objects=["last_clicked"],  # Só retorna o necessário
+        )
+
+def mapa_Assentamentos():
+    mapa_hidrográfico()
+
 
 
 # ---------------------------------------------------
@@ -543,6 +682,12 @@ with st.sidebar:
 
     if st.button("Mapa Gini", use_container_width=True, icon=":material/crisis_alert:"):
         st.session_state.current_page = "Mapa Gini"
+    
+    if st.button("Mapa Hidrográfico", use_container_width=True, icon=":material/crisis_alert:"):
+        st.session_state.current_page = "Mapa Hidrografico"
+    
+    if st.button("Mapa de Assentamentos", use_container_width=True, icon=":material/crisis_alert:"):
+        st.session_state.current_page = "Mapa de Assentamento"
 
     if st.button("Sobre", use_container_width=True, icon=":material/info:"):
         st.session_state.current_page = "Sobre"
@@ -583,6 +728,13 @@ elif st.session_state.current_page == "Mapa Contextual":
 elif st.session_state.current_page == "Mapa Gini":
     st.title("Mapa Gini")
     mapa_gini()
+
+elif st.session_state.current_page == "Mapa Hidrografico":
+    st.title("Mapa Hidrográfico")
+    mapa_hidrográfico()
+elif st.session_state.current_page == "Mapa de Assentamento":
+    st.title("Mapa de Assentamento")
+    mapa_Assentamentos()
 
 elif st.session_state.current_page == "Sobre":
     st.title("Sobre")
