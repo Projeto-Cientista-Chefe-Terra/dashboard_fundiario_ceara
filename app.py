@@ -683,10 +683,10 @@ with st.sidebar:
     if st.button("Mapa Gini", use_container_width=True, icon=":material/crisis_alert:"):
         st.session_state.current_page = "Mapa Gini"
     
-    if st.button("Mapa Hidrográfico", use_container_width=True, icon=":material/crisis_alert:"):
+    if st.button("Mapa Hidrográfico", use_container_width=True, icon=":material/water_drop:"):
         st.session_state.current_page = "Mapa Hidrografico"
     
-    if st.button("Mapa de Assentamentos", use_container_width=True, icon=":material/crisis_alert:"):
+    if st.button("Mapa de Assentamentos", use_container_width=True, icon=":material/globe_location_pin:"):
         st.session_state.current_page = "Mapa de Assentamento"
 
     if st.button("Sobre", use_container_width=True, icon=":material/info:"):
