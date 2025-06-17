@@ -10,7 +10,6 @@ import folium
 import json
 from folium.plugins import Fullscreen
 import os
-import time
 from datetime import datetime
 from folium.features import GeoJsonTooltip
 from shapely.geometry import Polygon, MultiPolygon
@@ -41,7 +40,7 @@ DATA_SERVICE_URL = st.secrets.get("DATA_SERVICE_URL", "http://localhost:8000")
 MAX_FEATURES = 500  # Limite para features simultâneas
 
 st.set_page_config(
-    page_title="ccTerra::Análise da Concentração Fundiária do Ceará",
+    page_title="Dashboard",
     page_icon="🌿",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -83,17 +82,23 @@ preparar_dados_ctx = st.cache_resource()(preparar_dados_ctx)
 
 DATA_FOLDER = "data/"
 
+CORES = {
+    "Pequena Propriedade < 1 MF": "#fecc5c",
+    "Pequena Propriedade": "#fd8d3c",
+    "Média Propriedade": "#f03b20",
+    "Grande Propriedade": "#bd0026",
+    "Sem Registros": "#eeeee4",
+
+}
 
 @st.cache_resource
 def load_once():
-
-    df_raw = load_data(DATA_FOLDER)
+    df_raw = load_data("") #load_data(DATA_FOLDER)
     return validate_data(df_raw)
 
 
 # Carrega e valida dados
 
-# start = time.time() # Teste de tempo de carga
 
     """
     Carrega e valida dados
@@ -144,7 +149,7 @@ def graficos_e_quadros():
         fig = plot_pizza(resultados, f"Propriedades - {opcao}", f"Total: {total}")
 
     if resultados:
-        st.html("<span>Dados atualizadoe em xx/xx/2025</span>")
+        st.html("<h5>Dados atualizadoe em 24/02/2025</h5>")
         df_tab = pd.DataFrame(
             list(resultados.items()), columns=["Categoria", "Quantidade"]
         )
@@ -161,35 +166,79 @@ def graficos_e_quadros():
 
 ######################### Mapa Contextual #########################
 
-# @st.cache_resource
-def test():
-    muni_gdf = load_municipios(DATA_FOLDER)
-    gdf_ctx = preparar_dados_ctx(df_ctx, muni_gdf)
-    return gdf_ctx
-
-
 def mapa_contextuall():
+    # Carrega os dados
+    dados_fundiarios = load_data("todos")
+    contorno_municipios = load_municipios("todos")
+    geo_data = preparar_dados_ctx(dados_fundiarios, contorno_municipios)
 
-    # st_folium(mapa, key="Contextual", width=900, height=600)
+    categorias = [
+        "Pequena Propriedade < 1 MF",
+        "Pequena Propriedade",
+        "Média Propriedade",
+        "Grande Propriedade"
+    ]
 
-    st.session_state.mapa_data = test()
-    st.session_state.mapa_obj = criar_mapa_contextual(st.session_state.mapa_data)
+    col1, col2 = st.columns([7, 3])
 
-    # Camada 2 - Renderização
-    map_container = st.empty()
-    current_data = test()
-
-    st.session_state.mapa_obj = criar_mapa_contextual(current_data)
-
-    # Camada 3 - Exibição
-    with map_container:
-        st_folium(
-            st.session_state.mapa_obj,
-            key=f"ctx_map_v",
-            width=900,
-            height=600,
-            returned_objects=["last_clicked"],  # Só retorna o necessário
+    with col2:
+        # Select de modo do mapa
+        modo_mapa = st.radio(
+            "Tipo de Mapa:",
+            options=["Categorias Dominantes", "Heatmap"],
+            index=0,
+            help="Escolha se quer ver as categorias dominantes ou um mapa de calor para uma categoria."
         )
+
+        # Select de categoria, só aparece se for Heatmap
+        categoria_heatmap = None
+        if modo_mapa == "Heatmap":
+            categoria_heatmap = st.selectbox(
+                "Categoria para Heatmap:",
+                categorias
+            )
+
+        # Select de município (sempre visível)
+        municipios = geo_data["nome_municipio"].sort_values().unique()
+        municipio_selecionado = st.selectbox(
+            "Selecione o município para ver os dados:",
+            municipios
+        )
+
+        # Monta a tabela dos valores das categorias do município selecionado
+        dados_muni = geo_data[geo_data["nome_municipio"] == municipio_selecionado]
+        if not dados_muni.empty:
+            tabela = pd.DataFrame({
+                "Categoria": categorias,
+                "Quantidade": [int(dados_muni.iloc[0].get(cat, 0)) for cat in categorias]
+            })
+            tabela.index += 1
+            st.markdown(f"#### Dados para {municipio_selecionado}")
+            st.table(tabela)
+        else:
+            st.info("Não há dados para esse município.")
+
+    # Cria o mapa normalmente
+    mapa_obj = criar_mapa_contextual(
+        gdf=geo_data,
+        modo_mapa=modo_mapa,
+        categoria_heatmap=categoria_heatmap,
+        cores=CORES,
+        contorno_municipios=contorno_municipios
+    )
+
+    with col1:
+        Fullscreen().add_to(mapa_obj)
+        st_folium(
+            mapa_obj,
+            key=f"ctx_map_{modo_mapa}_{categoria_heatmap}",
+            width=1200,
+            height=600,
+            returned_objects=["last_clicked"],
+        )
+
+
+
 
 ######################### Mapa Interativo da Malha Fundiária #########################
 def mapa_interativo():
@@ -212,25 +261,18 @@ def mapa_interativo():
         return [-5.2, -39.0]
 
 
-    CORES = {
-        "Pequena Propriedade < 1 MF": "#fecc5c",
-        "Pequena Propriedade": "#fd8d3c",
-        "Média Propriedade": "#f03b20",
-        "Grande Propriedade": "#bd0026",
-        "Sem Classificação": "#eeeee4"
-    }
 
     regioes = fetch_regioes()
     if not regioes:
         st.error("Erro ao carregar regiões.")
         st.stop()
     
-    col1, col2 = st.columns([3,2])
+    col1, col2 = st.columns([8,2])
 
-    regiao = col2.selectbox("Selecione a região administrativa", regioes)
+    regiao = col2.selectbox("Região administrativa", regioes)
 
     municipios = fetch_municipios(regiao)
-    municipio = col2.selectbox("Selecione o município (opcional)", ["(toda a região)"] + municipios)
+    municipio = col2.selectbox("Município", ["(toda a região)"] + municipios)
 
 
 
@@ -300,8 +342,8 @@ def mapa_interativo():
                     'fillColor': cor, 'color': '#000', 'weight': 0.5, 'fillOpacity': 0.6
                 },
                 tooltip=folium.GeoJsonTooltip(
-                    fields=['nome_municipio', 'area', 'categoria'],
-                    aliases=['Município:', 'Área (ha):', 'Categoria:'],
+                    fields=['imovel','data_criacao_lote', 'numero_incra','numero_lote', 'area','situacao_juridica','regiao_administrativa','nome_municipio_original', 'distrito', 'localidade', 'categoria'],
+                    aliases=['Nome:','Data de Criação:','N° Incra:','N° Lote:','Área (ha):','Situação Jurídica:','Região Administrativa:','Município:', 'Distrito:', 'Localidade:', 'Categoria:'],
                     localize=True
                 )
             ).add_to(fg)
@@ -320,13 +362,13 @@ def mapa_interativo():
 
 def mapa_gini():
     @st.cache_data
-    def load_data_gini():
-        df = pd.read_csv(
-            "data/dataset-malha-fundiaria-idace_preprocessado-2025-04-26.csv",
-            low_memory=False,
-        )
-        gdf = gpd.read_file("data/geojson-municipios_ceara-normalizado.geojson")
-        return df, gdf
+    # def load_data_gini():
+    #     df = pd.read_csv(
+    #         "data/dataset-malha-fundiaria-idace_preprocessado-2025-04-26.csv",
+    #         low_memory=False,
+    #     )
+    #     gdf = gpd.read_file("data/geojson-municipios_ceara-normalizado.geojson")
+    #     return df, gdf
 
     # Normalização de nomes
 
@@ -350,7 +392,10 @@ def mapa_gini():
 
     # Carrega dados
 
-    df_props, municipios = load_data_gini()
+    #df_props, municipios = load_data_gini()
+    df_props = load_data("todos")
+    municipios = load_municipios("todos")
+
 
     # Detecta outliers via IQR para uso interno
     areas = df_props["area"]
@@ -393,7 +438,7 @@ def mapa_gini():
     def normalizar_municipios(municipios):
         """Função sem cache para GeoDataFrame"""
         municipios = municipios.copy()
-        municipios["nome_municipio"] = municipios["NM_MUN"].apply(normalizar_nome)
+        municipios["nome_municipio"] = municipios["nome_municipio"].apply(normalizar_nome)
         return municipios.rename(columns={"nome_municipio": "nome_municipio"})
 
     
@@ -474,7 +519,7 @@ def mapa_gini():
             c = "#6e1111"
         return {"fillColor": c, "color": "black", "weight": 0.5, "fillOpacity": 0.8}
 
-    col1, col2 = st.columns([2, 1])
+    col1, col2 = st.columns([6, 4])
 
     with col2:
         st.subheader("Índice de Gini ")
@@ -492,9 +537,9 @@ def mapa_gini():
             height: var(--tamanho);
             border-radius: 50%;
             background: conic-gradient(
-                #FFD700 0%,
-                #D4AF37 calc(var(--porcentagem) * 100%),
-                #e0e0e0 0%
+                #6e1111 0%,
+                #f5e1df calc(var(--porcentagem) * 100%),
+                #fcf1f0 0%
             );
             display: grid;
             place-items: center;
@@ -565,7 +610,8 @@ def mapa_gini():
                     <i style='background:#D3D3D3;width:12px;height:12px;float:left;margin-right:4px'></i>Sem dados
                     </div>"""
             m.get_root().html.add_child(folium.Element(legend_html))
-            st_folium(m, width=1100, height=800)
+            Fullscreen().add_to(m)
+            st_folium(m, width=1000, height=900)
 
 ######################### Estrutura Geral de Navegação #########################
     # Renderiza mapas
@@ -692,7 +738,7 @@ with open("style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 st.markdown(
-    "<h2 class='custom-header'>ccTerra::Dashboard Fundiário</h2>",
+    "<h2 class='custom-header'>Dashboard da Malha Fundiária do Ceará</h2>",
     unsafe_allow_html=True,
 )
 
@@ -703,7 +749,7 @@ if "current_page" not in st.session_state:
     st.session_state.current_page = "Gráficos"
 
 with st.sidebar:
-    st.header("Navegação")  # TODO fazer o background diferente para o selecionado
+    st.header(" ")  # TODO fazer o background diferente para o selecionado
     # CSS para ícones Font Awesome
     if st.button(
         "Gráficos e Quadros", use_container_width=True, icon=":material/bar_chart:"
@@ -743,7 +789,7 @@ if st.session_state.current_page == "Gráficos":
     graficos_e_quadros()
 
 elif st.session_state.current_page == "Mapa Contextual":
-    st.title("Classificação de Lotes")
+    st.title("Mapa Contextual dos Lotes")
     mapa_contextuall()
 
 elif st.session_state.current_page == "Mapa Gini":
