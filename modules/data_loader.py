@@ -73,7 +73,7 @@ def load_municipios(base_folder: str) -> gpd.GeoDataFrame:
     
     # Busca geometrias com parâmetro de simplificação
     features = []
-    for muni in muni_list[:50]:  # Limite para teste - ajustar conforme necessário
+    for muni in muni_list:
         try:
             geojson = _fetch_from_api(
                 "geojson_muni", 
@@ -95,7 +95,6 @@ def load_municipios(base_folder: str) -> gpd.GeoDataFrame:
 
 @st.cache_resource
 def validate_data(df: pd.DataFrame) -> tuple:
-    """Versão otimizada da validação de dados"""
     # Filtra dados inválidos
     df_class = df.dropna(subset=['modulo_fiscal', 'area']).copy()
     

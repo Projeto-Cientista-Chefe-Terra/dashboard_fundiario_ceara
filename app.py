@@ -14,6 +14,15 @@ from datetime import datetime
 from folium.features import GeoJsonTooltip
 from shapely.geometry import Polygon, MultiPolygon
 
+
+from typing import TypedDict
+
+class DebugInfo(TypedDict):
+    municipios_recebidos: int
+    municipios_com_dados: int | None  # None até ser calculado
+    municipios_sem_dados: int | None
+
+
 from modules.data_loader_aux import (
     fetch_regioes, fetch_municipios,
     fetch_geojson_por_regiao, fetch_geojson_por_municipio,
@@ -30,14 +39,15 @@ from modules import (
     plot_pizza,
     compute_stats_df,
     load_municipios,
-    preparar_dados as preparar_dados_ctx,
+    preparar_dados,
     criar_mapa_contextual,
 
 )
 
+
 # Configurações
 DATA_SERVICE_URL = st.secrets.get("DATA_SERVICE_URL", "http://localhost:8000")
-MAX_FEATURES = 500  # Limite para features simultâneas
+# MAX_FEATURES = 500  # Limite para features simultâneas
 
 st.set_page_config(
     page_title="Dashboard",
@@ -69,7 +79,7 @@ compute_stats_df = st.cache_resource()(
 
 # Cacheia GeoDataFrame de municípios e preparação de contexto
 load_municipios = st.cache_resource()(load_municipios)
-preparar_dados_ctx = st.cache_resource()(preparar_dados_ctx)
+preparar_dados_ctx = st.cache_resource()(preparar_dados)
 
 
 # -----------------------------
@@ -80,7 +90,7 @@ preparar_dados_ctx = st.cache_resource()(preparar_dados_ctx)
 # 0) Definição de funções de visualizações
 # ---------------------------------------------------
 
-DATA_FOLDER = "data/"
+# DATA_FOLDER = "data/"
 
 CORES = {
     "Pequena Propriedade < 1 MF": "#fecc5c",
@@ -166,76 +176,170 @@ def graficos_e_quadros():
 
 ######################### Mapa Contextual #########################
 
-def mapa_contextuall():
-    # Carrega os dados
-    dados_fundiarios = load_data("todos")
-    contorno_municipios = load_municipios("todos")
-    geo_data = preparar_dados_ctx(dados_fundiarios, contorno_municipios)
+# def mapa_contextuall():
+#     # Carrega os dados
+#     dados_fundiarios = load_data("")
+#     contorno_municipios = load_municipios("")
+#     geo_data = preparar_dados_ctx(dados_fundiarios, contorno_municipios)
 
+#     categorias = [
+#         "Pequena Propriedade < 1 MF",
+#         "Pequena Propriedade",
+#         "Média Propriedade",
+#         "Grande Propriedade"
+#     ]
+
+#     col1, col2 = st.columns([7, 3])
+
+#     with col2:
+#         # Select de modo do mapa
+#         modo_mapa = st.radio(
+#             "Tipo de Mapa:",
+#             options=["Categorias Dominantes", "Heatmap"],
+#             index=0,
+#             help="Escolha se quer ver as categorias dominantes ou um mapa de calor para uma categoria."
+#         )
+
+#         # Select de categoria, só aparece se for Heatmap
+#         categoria_heatmap = None
+#         if modo_mapa == "Heatmap":
+#             categoria_heatmap = st.selectbox(
+#                 "Categoria para Heatmap:",
+#                 categorias
+#             )
+
+#         # Select de município (sempre visível)
+#         municipios = geo_data["nome_municipio"].sort_values().unique()
+#         municipio_selecionado = st.selectbox(
+#             "Selecione o município para ver os dados:",
+#             municipios
+#         )
+
+#         # Monta a tabela dos valores das categorias do município selecionado
+#         dados_muni = geo_data[geo_data["nome_municipio"] == municipio_selecionado]
+#         if not dados_muni.empty:
+#             tabela = pd.DataFrame({
+#                 "Categoria": categorias,
+#                 "Quantidade": [int(dados_muni.iloc[0].get(cat, 0)) for cat in categorias]
+#             })
+#             tabela.index += 1
+#             st.markdown(f"#### Dados para {municipio_selecionado}")
+#             st.table(tabela)
+#         else:
+#             st.info("Não há dados para esse município.")
+
+#     # Cria o mapa normalmente
+#     mapa_obj = criar_mapa_contextual(
+#         gdf=geo_data,
+#         modo_mapa=modo_mapa,
+#         categoria_heatmap=categoria_heatmap,
+#         cores=CORES,
+#         contorno_municipios=contorno_municipios
+#     )
+
+#     with col1:
+#         Fullscreen().add_to(mapa_obj)
+#         st_folium(
+#             mapa_obj,
+#             key=f"ctx_map_{modo_mapa}_{categoria_heatmap}",
+#             width=1200,
+#             height=600,
+#             returned_objects=["last_clicked"],
+#         )
+
+def mapa_contextuall():
+    
+    # Carrega dados
+    dados_fundiarios = load_data("")
+    contorno_municipios = load_municipios("")
     categorias = [
         "Pequena Propriedade < 1 MF",
         "Pequena Propriedade",
         "Média Propriedade",
         "Grande Propriedade"
     ]
-
+    
+    # Processa dados (agora com verificação embutida)
+    geo_data, df_tabular, debug_info = preparar_dados_ctx(
+        df_ctx=dados_fundiarios,
+        _muni_gdf=contorno_municipios,
+        _categorias=categorias
+    )
+    
     col1, col2 = st.columns([7, 3])
 
     with col2:
-        # Select de modo do mapa
+        # Controles do mapa
         modo_mapa = st.radio(
             "Tipo de Mapa:",
             options=["Categorias Dominantes", "Heatmap"],
-            index=0,
-            help="Escolha se quer ver as categorias dominantes ou um mapa de calor para uma categoria."
+            index=0
         )
-
-        # Select de categoria, só aparece se for Heatmap
+        
         categoria_heatmap = None
         if modo_mapa == "Heatmap":
-            categoria_heatmap = st.selectbox(
-                "Categoria para Heatmap:",
-                categorias
-            )
+            categoria_heatmap = st.selectbox("Categoria para Heatmap:", categorias)
 
-        # Select de município (sempre visível)
-        municipios = geo_data["nome_municipio"].sort_values().unique()
+        # Seleção do município com dados completos
         municipio_selecionado = st.selectbox(
-            "Selecione o município para ver os dados:",
-            municipios
+            "Selecione o município:",
+            options=geo_data["nome_municipio"].sort_values().unique(),
+            format_func=lambda x: f"{x} ({'com dados' if df_tabular[df_tabular['nome_municipio']==x]['total'].iloc[0] > 0 else 'Sem Registros'})"
         )
 
-        # Monta a tabela dos valores das categorias do município selecionado
-        dados_muni = geo_data[geo_data["nome_municipio"] == municipio_selecionado]
-        if not dados_muni.empty:
-            tabela = pd.DataFrame({
-                "Categoria": categorias,
-                "Quantidade": [int(dados_muni.iloc[0].get(cat, 0)) for cat in categorias]
+        # Tabela otimizada
+        st.markdown(f"#### Dados para {municipio_selecionado}")
+        dados_muni = df_tabular[df_tabular["nome_municipio"] == municipio_selecionado]
+        
+        st.dataframe(
+            dados_muni[categorias + ["total"]]
+            .rename(columns={
+                "Pequena Propriedade < 1 MF": "Pequena <1MF",
+                "total": "Total"
             })
-            tabela.index += 1
-            st.markdown(f"#### Dados para {municipio_selecionado}")
-            st.table(tabela)
-        else:
-            st.info("Não há dados para esse município.")
-
-    # Cria o mapa normalmente
-    mapa_obj = criar_mapa_contextual(
-        gdf=geo_data,
-        modo_mapa=modo_mapa,
-        categoria_heatmap=categoria_heatmap,
-        cores=CORES,
-        contorno_municipios=contorno_municipios
-    )
+            .T.rename_axis("Categoria")
+            .rename(columns={dados_muni.index[0]: "Quantidade"}),
+            use_container_width=True
+        )
 
     with col1:
-        Fullscreen().add_to(mapa_obj)
-        st_folium(
-            mapa_obj,
-            key=f"ctx_map_{modo_mapa}_{categoria_heatmap}",
-            width=1200,
-            height=600,
-            returned_objects=["last_clicked"],
+        # Mapa com dados integrados
+        mapa_obj = criar_mapa_contextual(
+            gdf=geo_data,
+            modo_mapa=modo_mapa,
+            categoria_heatmap=categoria_heatmap,
+            cores=CORES,
+            contorno_municipios=contorno_municipios
         )
+        st_folium(mapa_obj, width=1200, height=600)
+
+    show_debug_info = False #st.checkbox("Mostrar informações de debug")
+   
+    # # Debug
+    if show_debug_info:
+        st.subheader("Informações de Processamento")
+        
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Municípios Recebidos", debug_info["municipios_recebidos"])
+        col2.metric("Com Dados", debug_info["municipios_com_dados"])
+        col3.metric("Sem Dados", debug_info["municipios_sem_dados"])
+        
+        st.write("---")
+        st.subheader("Amostra dos Dados")
+        
+        tab1, tab2 = st.tabs(["GeoDataFrame", "Dados Tabulares"])
+        
+        with tab1:
+            st.write("5 primeiros municípios:", geo_data[["nome_municipio", "dominante", "total"]].head())
+            st.write(f"Total no GeoDataFrame: {len(geo_data)} municípios")
+            
+        with tab2:
+            st.write("5 primeiros registros:", df_tabular.head())
+            st.write(f"Total no DataFrame: {len(df_tabular)} registros")
+        
+        st.write("---")
+        st.subheader("Verificação de Integridade")
+        st.write(f"GeoDataFrame contém todos municípios? {'✅ Sim' if len(geo_data) == debug_info['municipios_recebidos'] else '❌ Não'}")
 
 
 
@@ -393,8 +497,8 @@ def mapa_gini():
     # Carrega dados
 
     #df_props, municipios = load_data_gini()
-    df_props = load_data("todos")
-    municipios = load_municipios("todos")
+    df_props = load_data("")
+    municipios = load_municipios("")
 
 
     # Detecta outliers via IQR para uso interno
@@ -523,10 +627,10 @@ def mapa_gini():
 
     with col2:
         st.subheader("Índice de Gini ")
-        st.markdown(
-            "<span style='color:black'>do estado do Ceará</span>",
-            unsafe_allow_html=True,
-        )
+        # st.markdown(
+        #     "<span style='color:black'>do estado do Ceará</span>",
+        #     unsafe_allow_html=True,
+        # )
         circular_grafic = f"""
         <style>
         .grafico {{
