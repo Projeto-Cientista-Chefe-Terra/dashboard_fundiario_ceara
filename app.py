@@ -124,14 +124,14 @@ df_all, df_class, df_inter, df_ctx, counts = load_once()
 ######################### Gráficos de Tabelas Gerais do Estado #########################
 
 def graficos_e_quadros():
-    col1, col2 = st.columns([3, 2])
-    tab1, tab2 = col1.tabs(["Gráfico de Barras", "Gráfico de Pizza"])
-    col2.subheader("Parâmetros de Busca")
+    col1, col2 = st.columns([6, 4])
+    tab1, tab2 = col1.tabs(["Gráfico de Pizza","Gráfico de Barras"])
+    col2.subheader("").markdown("##### Filtrar por:")
     co2_1, co2_2 = col2.columns([1, 1])
     opcao = co2_1.selectbox(
-        "Mostrar por:", ["Todo o Estado", "Municípios", "Regiões Administrativas"]
+        "", ["Todo o Estado", "Municípios", "Regiões Administrativas"]
     )
-    entidade = None
+    entidade = ""
     if opcao != "Todo o Estado":
         col = "nome_municipio" if opcao == "Municípios" else "regiao_administrativa"
         entidade = co2_2.selectbox(f"{opcao}:", sorted(df_class[col].dropna().unique()))
@@ -140,23 +140,27 @@ def graficos_e_quadros():
     resultados, total = classificar_propriedades(df_filtrado)
 
     def preencher_tabs():
-        fig_barra = plot_barras(
-            resultados, f"Propriedades - {opcao} - {entidade}", f"Total: {total}"
-        )
         fig_pizza = plot_pizza(
             resultados, f"Propriedades - {opcao} - {entidade}", f"Total: {total}"
         )
+        fig_barra = plot_barras(
+            resultados, f"Propriedades - {opcao} - {entidade}", f"Total: {total}"
+        )
 
-        tab1.pyplot(fig_barra)
-        tab2.pyplot(fig_pizza)
 
-        col2.subheader(f"Classificação de Propriedades")
-        col2.html(f"""<p id="op-ent">{opcao} - &lt;{entidade}&gt; </p>""")
+        tab1.pyplot(fig_pizza)
+        tab2.pyplot(fig_barra)
+        
+
+        col2.subheader("").markdown("#### Classificação de Propriedades")
+        col2.html(f"""
+                  <p id="op-ent"><b>[{opcao}]</b>{entidade} </p>
+                  """)
         col2.table(df_tab)
 
-        col2.subheader("Estatísticas Adicionais")
+        col2.subheader("").markdown("#### Estatísticas Gerais")
         col2.table(compute_stats_df(df_class))
-        fig = plot_pizza(resultados, f"Propriedades - {opcao}", f"Total: {total}")
+
 
     if resultados:
         st.html("<h5>Dados atualizadoe em 24/02/2025</h5>")
@@ -176,78 +180,7 @@ def graficos_e_quadros():
 
 ######################### Mapa Contextual #########################
 
-# def mapa_contextuall():
-#     # Carrega os dados
-#     dados_fundiarios = load_data("")
-#     contorno_municipios = load_municipios("")
-#     geo_data = preparar_dados_ctx(dados_fundiarios, contorno_municipios)
-
-#     categorias = [
-#         "Pequena Propriedade < 1 MF",
-#         "Pequena Propriedade",
-#         "Média Propriedade",
-#         "Grande Propriedade"
-#     ]
-
-#     col1, col2 = st.columns([7, 3])
-
-#     with col2:
-#         # Select de modo do mapa
-#         modo_mapa = st.radio(
-#             "Tipo de Mapa:",
-#             options=["Categorias Dominantes", "Heatmap"],
-#             index=0,
-#             help="Escolha se quer ver as categorias dominantes ou um mapa de calor para uma categoria."
-#         )
-
-#         # Select de categoria, só aparece se for Heatmap
-#         categoria_heatmap = None
-#         if modo_mapa == "Heatmap":
-#             categoria_heatmap = st.selectbox(
-#                 "Categoria para Heatmap:",
-#                 categorias
-#             )
-
-#         # Select de município (sempre visível)
-#         municipios = geo_data["nome_municipio"].sort_values().unique()
-#         municipio_selecionado = st.selectbox(
-#             "Selecione o município para ver os dados:",
-#             municipios
-#         )
-
-#         # Monta a tabela dos valores das categorias do município selecionado
-#         dados_muni = geo_data[geo_data["nome_municipio"] == municipio_selecionado]
-#         if not dados_muni.empty:
-#             tabela = pd.DataFrame({
-#                 "Categoria": categorias,
-#                 "Quantidade": [int(dados_muni.iloc[0].get(cat, 0)) for cat in categorias]
-#             })
-#             tabela.index += 1
-#             st.markdown(f"#### Dados para {municipio_selecionado}")
-#             st.table(tabela)
-#         else:
-#             st.info("Não há dados para esse município.")
-
-#     # Cria o mapa normalmente
-#     mapa_obj = criar_mapa_contextual(
-#         gdf=geo_data,
-#         modo_mapa=modo_mapa,
-#         categoria_heatmap=categoria_heatmap,
-#         cores=CORES,
-#         contorno_municipios=contorno_municipios
-#     )
-
-#     with col1:
-#         Fullscreen().add_to(mapa_obj)
-#         st_folium(
-#             mapa_obj,
-#             key=f"ctx_map_{modo_mapa}_{categoria_heatmap}",
-#             width=1200,
-#             height=600,
-#             returned_objects=["last_clicked"],
-#         )
-
-def mapa_contextuall():
+def mapa_contextual():
     
     # Carrega dados
     dados_fundiarios = load_data("")
@@ -844,18 +777,16 @@ with open("style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 st.markdown(
-    "<h2 class='custom-header'>Dashboard da Malha Fundiária do Ceará</h2>",
+    "# Malha Fundiária do Ceará",
     unsafe_allow_html=True,
 )
 
-# page = st.sidebar.selectbox(
-#     "Navegação", ["Gráficos", "Mapa Contextual", "Mapa Interativo", "Mapa Gini"]
-# )
+
 if "current_page" not in st.session_state:
     st.session_state.current_page = "Gráficos"
 
 with st.sidebar:
-    st.header(" ")  # TODO fazer o background diferente para o selecionado
+    st.header("")  # TODO fazer o background diferente para o selecionado
     # CSS para ícones Font Awesome
     if st.button(
         "Gráficos e Quadros", use_container_width=True, icon=":material/bar_chart:"
@@ -891,28 +822,28 @@ st.logo("./assets/CC_Terra.png", size="large")
 # 7) Lógica de cada aba
 # ---------------------------------------------------
 if st.session_state.current_page == "Gráficos":
-    st.title("Gráficos e Quadros")
+    st.title("").markdown("### Gráficos e Quadros")
     graficos_e_quadros()
 
 elif st.session_state.current_page == "Mapa Contextual":
-    st.title("Mapa Contextual dos Lotes")
-    mapa_contextuall()
+    st.title("").markdown("### Mapa Contextual dos Lotes")
+    mapa_contextual()
+
+elif st.session_state.current_page == "Mapa Interativo":
+    st.title("").markdown("### Mapa Interativo")
+    mapa_interativo()
 
 elif st.session_state.current_page == "Mapa Gini":
-    st.title("Mapa Gini")
+    st.title("").markdown("### Mapa Gini do Ceará")
     mapa_gini()
 
 elif st.session_state.current_page == "Mapa Hidrografico":
-    st.title("Mapa Hidrográfico")
+    st.title("").markdown("### Mapa Hidrográfico")
     mapa_hidrográfico()
 elif st.session_state.current_page == "Mapa de Assentamento":
-    st.title("Mapa de Assentamento")
+    st.title("").markdown("### Mapa de Assentamentos")
     mapa_Assentamentos()
 
 elif st.session_state.current_page == "Sobre":
-    st.title("Sobre")
+    st.title("").markdown("### Sobre")
     sobre()
-
-else:  # Mapa Interativo
-    st.title("Mapa Interativo")
-    mapa_interativo()
