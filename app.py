@@ -281,14 +281,15 @@ def mapa_contextuall():
             categoria_heatmap = st.selectbox("Categoria para Heatmap:", categorias)
 
         # Seleção do município com dados completos
+        st.markdown("#### Classificação do Município")
         municipio_selecionado = st.selectbox(
-            "Selecione o município:",
+            "Selecione o município",
             options=geo_data["nome_municipio"].sort_values().unique(),
-            format_func=lambda x: f"{x} ({'com dados' if df_tabular[df_tabular['nome_municipio']==x]['total'].iloc[0] > 0 else 'Sem Registros'})"
+            format_func=lambda x: f"{x} ({'com dados' if df_tabular[df_tabular['nome_municipio']==x]['total'].iloc[0] > 0 else 'sem dados'})"
         )
 
-        # Tabela otimizada
-        st.markdown(f"#### Dados para {municipio_selecionado}")
+        # Tabela de dados do município
+        #st.markdown("##### Classificação dos Lotes")
         dados_muni = df_tabular[df_tabular["nome_municipio"] == municipio_selecionado]
         
         st.dataframe(
@@ -298,7 +299,7 @@ def mapa_contextuall():
                 "total": "Total"
             })
             .T.rename_axis("Categoria")
-            .rename(columns={dados_muni.index[0]: "Quantidade"}),
+            .rename(columns={dados_muni.index[0]: "Quantidade de Lotes"}),
             use_container_width=True
         )
 
@@ -311,6 +312,7 @@ def mapa_contextuall():
             cores=CORES,
             contorno_municipios=contorno_municipios
         )
+        Fullscreen().add_to(mapa_obj)
         st_folium(mapa_obj, width=1200, height=600)
 
     show_debug_info = False #st.checkbox("Mostrar informações de debug")

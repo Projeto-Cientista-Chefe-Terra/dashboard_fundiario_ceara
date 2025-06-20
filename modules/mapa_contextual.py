@@ -325,10 +325,21 @@ def criar_mapa_contextual(
             },
             tooltip=folium.GeoJsonTooltip(
                 fields=['nome_municipio', 'dominante'],
-                aliases=['Município:', 'Categoria Dominante:'],
-                localize=True
+                aliases=['Município:', 'Tipo Dominante:'],
+                # fields=[
+                #     'nome_municipio','total','Pequena Propriedade < 1 MF','Pequena Propriedade',
+                #     'Média Propriedade','Grande Propriedade','dominante'
+                # ],
+                # aliases=[
+                #     'Município','Total de Lotes','Total de Pequena Propriedade < 1 MF',
+                #     'Total de Pequenas Propriedades','Total de Médias Propriedades',
+                #     'Total de Grandes Propriedades','Categoria Dominante'
+                # ],
+                localize=True,
+                labels=True,
+                sticky=False
             ),
-            name="_categorias Dominantes"
+            name="Categorias Dominantes"
         ).add_to(mapa)
 
     # Adiciona legenda e controles
@@ -346,7 +357,7 @@ def _adicionar_legenda(mapa: folium.Map, cores: dict):
        width: 220px; background: white; padding: 10px;
        border:2px solid grey; z-index:9999;
        font-size:12px; line-height:1.2em;">
-      <b>_categorias de Lotes</b><br>
+      <b>Classificação dos Lotes</b><br>
       {% for cat, color in this.cores.items() %}
         <i style="background:{{color}};width:18px;height:14px;
                   display:inline-block;margin-right:8px;"></i>{{cat}}<br>
