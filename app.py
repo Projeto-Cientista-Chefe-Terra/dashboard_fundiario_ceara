@@ -115,7 +115,7 @@ def load_once():
       - df_all   : DataFrame completo com dados fundiários de todos os municípios do ceará
       - df_class : DataFrame com a classificação de propriedades de todo o ceará
       - gdf_inter: GeoDataFrame pronto para mapa interativo pois contém as informações de geometria as propriedades
-      - df_ctx   : DataFrame para mapa contextual
+      - df_ctx   : DataFrame para mapa de Predominância
       - counts   : dict de totais e descartados
     """
 
@@ -178,9 +178,9 @@ def graficos_e_quadros():
 
 
 
-######################### Mapa Contextual #########################
+######################### Mapa de Predominância #########################
 
-def mapa_contextual():
+def mapa_de_Predominância():
     
     # Carrega dados
     dados_fundiarios = load_data("")
@@ -450,10 +450,10 @@ def mapa_gini():
     ]
 
     # Salva somente áreas absurdas em CSV
-    os.makedirs("removed_registers", exist_ok=True)
-    date_str = datetime.now().strftime("%Y-%m-%d")
-    removed_file = f"removed_registers/gini_removed_{date_str}.csv"
-    out_err.to_csv(removed_file, index=False)
+    # os.makedirs("removed_registers", exist_ok=True)
+    # date_str = datetime.now().strftime("%Y-%m-%d")
+    # removed_file = f"removed_registers/gini_removed_{date_str}.csv"
+    # out_err.to_csv(removed_file, index=False)
 
     # Prepara DataFrames para cálculos
     @st.cache_data
@@ -607,10 +607,6 @@ def mapa_gini():
             f"<p style='text-align: center; color:black;'>Valor absoluto {state_no_warn:.4f}</p>",
             unsafe_allow_html=True,
         )
-
-    # Abas
-    tabs = col2.tabs(["Tabela Gini por município", "Lotes Excluídos"])
-
     # Renderização de mapas
     def render_map(tab, geo_df):
         with tab:
@@ -655,9 +651,8 @@ def mapa_gini():
 ######################### Estrutura Geral de Navegação #########################
     # Renderiza mapas
     render_map(col1, geo_with)
-
     # Tabelas
-    with tabs[0]:
+    with col2:
         st.subheader("Tabela Gini por município")
         st.dataframe(
             gini_with_filt[
@@ -672,24 +667,6 @@ def mapa_gini():
             ),
             use_container_width=True,
         )
-
-    with tabs[1]:
-        st.subheader("Lotes Excluídos")
-        out_disp = out_err[
-            ["lote_id", "nome_municipio_original", "regiao_administrativa", "area"]
-        ].copy()
-        out_disp["Área"] = out_disp["area"].map(lambda x: str(x).replace(".", ","))
-        st.dataframe(
-            out_disp.rename(
-                columns={
-                    "lote_id": "Lote ID",
-                    "nome_municipio_original": "Município",
-                    "regiao_administrativa": "Região",
-                }
-            )[["Lote ID", "Município", "Região", "Área"]],
-            use_container_width=True,
-        )
-    # Gini estadual e notas
 
 
 def sobre():
@@ -729,22 +706,27 @@ def sobre():
 
     # Link para o projeto
     st.header("Cientista Chefe Terra de Governança Fundiária e Ambiental")
+    st.markdown("#### Site Institucional")
+    st.markdown("https://ccterra-site.vercel.app")
     st.markdown("#### Código Fonte")
     st.markdown("https://github.com/Projeto-Cientista-Chefe-Terra")
 
     st.header("Apoio")
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4, vertical_alignment='center')
 
     with col1:
-        st.image("./assets/ufc_logo.png", width=150)
+        st.image("./assets/Idace.png", width=150)
         
 
     with col2:
-        st.image("./assets/funcap.png", width=150)
+        st.image("./assets/CC_Terra.png", width=150)
 
 
     with col3:
-        st.image("./assets/Idace.png", width=150)
+        st.image("./assets/funcap.png", width=150)
+        
+    with col4:
+        st.image("./assets/ufc_logo.png", width=150)
         
 
 def mapa_hidrográfico():
@@ -793,9 +775,9 @@ with st.sidebar:
     ):
         st.session_state.current_page = "Gráficos"
     if st.button(
-        "Mapa Contextual", use_container_width=True, icon=":material/location_on:"
+        "Mapa de Predominância", use_container_width=True, icon=":material/location_on:"
     ):
-        st.session_state.current_page = "Mapa Contextual"
+        st.session_state.current_page = "Mapa de Predominância"
     if st.button("Mapa Interativo", use_container_width=True, icon=":material/map:"):
         st.session_state.current_page = "Mapa Interativo"
 
@@ -825,9 +807,9 @@ if st.session_state.current_page == "Gráficos":
     st.title("").markdown("### Gráficos e Quadros")
     graficos_e_quadros()
 
-elif st.session_state.current_page == "Mapa Contextual":
-    st.title("").markdown("### Mapa Contextual dos Lotes")
-    mapa_contextual()
+elif st.session_state.current_page == "Mapa de Predominância":
+    st.title("").markdown("### Mapa de Predominância do Tipo de  Imóvel por Município")
+    mapa_de_Predominância()
 
 elif st.session_state.current_page == "Mapa Interativo":
     st.title("").markdown("### Mapa Interativo")
