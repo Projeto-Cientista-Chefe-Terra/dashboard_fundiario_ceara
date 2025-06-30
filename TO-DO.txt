@@ -6,4 +6,4 @@
 
 # TO-DO: Colocar as totalizações por tipo de imóveis por tipo
 # TO-DO: Como colocar o nosso CCTerra no Vitrine do Cientista Chefe
-# TO-DO: Colocar o Site do Terra no ar, como 
+# TO-DO: Colocar o Site do Terra no ar, como OK

@@ -14,8 +14,6 @@ from folium.features import GeoJsonTooltip
 from shapely.geometry import Polygon, MultiPolygon
 import requests
 from typing import Optional
-
-
 from typing import TypedDict
 
 class DebugInfo(TypedDict):
@@ -104,7 +102,7 @@ CORES = {
 
 @st.cache_resource
 def load_once():
-    df_raw = load_data("") #load_data(DATA_FOLDER)
+    df_raw = load_data("")
     return validate_data(df_raw)
 
 
@@ -130,7 +128,9 @@ def graficos_e_quadros():
     col2.subheader("").markdown("##### Filtrar por:")
     co2_1, co2_2 = col2.columns([1, 1])
     opcao = co2_1.selectbox(
-        "", ["Todo o Estado", "Municípios", "Regiões Administrativas"]
+        "Filtrar por:", 
+        ["Todo o Estado", "Municípios", "Regiões Administrativas"],
+        label_visibility="hidden"
     )
     entidade = ""
     if opcao != "Todo o Estado":
@@ -400,16 +400,8 @@ def mapa_interativo():
 
 ######################### Mapa de Gini do Estado #########################
 
-def mapa_gini():
-    @st.cache_data
-    # def load_data_gini():
-    #     df = pd.read_csv(
-    #         "data/dataset-malha-fundiaria-idace_preprocessado-2025-04-26.csv",
-    #         low_memory=False,
-    #     )
-    #     gdf = gpd.read_file("data/geojson-municipios_ceara-normalizado.geojson")
-    #     return df, gdf
 
+def mapa_gini():
     # Normalização de nomes
 
     @st.cache_data
@@ -421,8 +413,8 @@ def mapa_gini():
 
     # Cálculo de Gini
     @st.cache_data
-    def gini(arr):
-        a = np.sort(np.array(arr, dtype=float))
+    def gini(_arr):
+        a = np.sort(np.array(_arr, dtype=float))
         a = a[a >= 0]
         n = a.size
         if n == 0:
@@ -442,19 +434,11 @@ def mapa_gini():
     Q1, Q3 = areas.quantile([0.25, 0.75])
     IQR = Q3 - Q1
     out_iqr = df_props[(areas < Q1 - 1.5 * IQR) | (areas > Q3 + 1.5 * IQR)]
-    # Detecta áreas absurdas: ≥ metade do estado
-    # HALF_STATE_HA = 1488860 / 2  # ~744430 ha
-    # out_err = df_props[df_props['area'] >= HALF_STATE_HA]
+
     HALF_STATE_HA = 1488860 / 2  # ~744430 ha
     out_err = df_props[
         (df_props["area"] >= HALF_STATE_HA) | (df_props["lote_id"] == 8601)
     ]
-
-    # Salva somente áreas absurdas em CSV
-    # os.makedirs("removed_registers", exist_ok=True)
-    # date_str = datetime.now().strftime("%Y-%m-%d")
-    # removed_file = f"removed_registers/gini_removed_{date_str}.csv"
-    # out_err.to_csv(removed_file, index=False)
 
     # Prepara DataFrames para cálculos
     @st.cache_data
@@ -516,8 +500,8 @@ def mapa_gini():
     gini_no = calc_gini_df(df_no)
 
     # Filtra warnings do DataFrame de tabelas
-    gini_with_filt = gini_with[gini_with["cnt"] > 1]
-    gini_no_filt = gini_no[gini_no["cnt"] > 1]
+    gini_with_filt = gini_with[gini_with["cnt"] > 100]
+    #gini_no_filt = gini_no[gini_no["cnt"] > 100]
 
     # Cálculo de Gini estadual sem warnings mas incluindo outliers
     state_no_warn = gini(
@@ -526,13 +510,13 @@ def mapa_gini():
 
     # Merge GeoJSON + Gini
     geo_with = muni_geo.merge(gini_with, on="nome_municipio", how="left")
-    geo_no = muni_geo.merge(gini_no, on="nome_municipio", how="left")
+    #geo_no = muni_geo.merge(gini_no, on="nome_municipio", how="left")
 
     # Estilo de polígonos
     @st.cache_data
     def style_fn(f):
         p = f["properties"]
-        if p.get("cnt") == 1:
+        if p.get("cnt") < 100:
             return {
                 "fillColor": "#FFD700",
                 "color": "black",
@@ -563,10 +547,6 @@ def mapa_gini():
 
     with col2:
         st.subheader("Índice de Gini ")
-        # st.markdown(
-        #     "<span style='color:black'>do estado do Ceará</span>",
-        #     unsafe_allow_html=True,
-        # )
         circular_grafic = f"""
         <style>
         .grafico {{
@@ -617,7 +597,7 @@ def mapa_gini():
 
             tooltip = GeoJsonTooltip(
                 fields=["nome_municipio_original", "gini_area", "cnt"],
-                aliases=["Município", "Índice de Gini", "# Lotes"],
+                aliases=["Município: ","Quantidade de Imóveis: ", "Índice de Gini: "],
                 localize=True,
                 sticky=True,
             )
@@ -636,8 +616,9 @@ def mapa_gini():
             # Adiciona aviso de lotes únicos
             legend_html = """
                     <div style='position:fixed;top:10px;right:10px;background:white;padding:10px;border:1px solid grey;font-size:14px;z-index:9999;'>
-                    <b>Intervalos de Gini</b><br>
-                    <i style='background:#FFD700;width:12px;height:12px;float:left;margin-right:4px'></i>1 lote (warning)<br>
+                    <b>Intervalos de Gini</b>
+                    <br><br>
+                    <i style='background:#FFD700;width:12px;height:12px;float:left;margin-right:4px'></i><100 imóveis<br>
                     <i style='background:#f9c0ba;width:12px;height:12px;float:left;margin-right:4px'></i>≤0.700<br>
                     <i style='background:#d8948c;width:12px;height:12px;float:left;margin-right:4px'></i>0.701–0.800<br>
                     <i style='background:#b66960;width:12px;height:12px;float:left;margin-right:4px'></i>0.801–0.850<br>
