@@ -1,0 +1,75 @@
+# docker-compose.yml para o dashboard fundiário do Ceará e chama o servidor terra
+
+version: "3.9"
+
+services:
+  dashboard:
+    build: .
+    container_name: dashboard_fundiario_ceara
+    depends_on:
+      tgdmserver:
+        condition: service_healthy
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    networks:
+      - terra_network
+    environment:
+      - DATA_SERVICE_URL=http://tgdmserver:8000 # Note o nome do serviço aqui
+    restart: unless-stopped
+
+  tgdmserver:
+    build:
+      context: ../terraGeoDataMiniServer
+      dockerfile: Dockerfile
+    container_name: terra_geodata_mini_server
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: terra
+      POSTGRES_PASSWORD: Asdsee;30
+      POSTGRES_DB: geodata
+    ports:
+      - "8000:8000"
+    networks:
+      - terra_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/version || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  postgres:
+    image: docker.io/postgis/postgis:latest
+    container_name: terra_postgis
+    environment:
+      POSTGRES_USER: terra
+      POSTGRES_PASSWORD: Asdsee;30
+      POSTGRES_DB: geodata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - terra_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U terra -d geodata"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data:
+
+networks:
+  terra_network:
+    name: terra_network
+    external: true
