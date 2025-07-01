@@ -11,7 +11,7 @@ import numpy as np
 from typing import Dict, List, Any, Optional
 
 # Configuração ajustável da API
-DATA_SERVICE_URL = os.getenv("DATA_SERVICE_URL", "http://tgdmserver:8000")
+DATA_SERVICE_URL = os.getenv("DATA_SERVICE_URL", "http://0.0.0.0:8000")
 REQUEST_TIMEOUT = 30  # segundos
 
 @st.cache_data(ttl=86400)
