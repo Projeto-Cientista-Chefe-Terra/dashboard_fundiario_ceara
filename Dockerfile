@@ -2,14 +2,12 @@
 FROM python:3.12-slim
 
 
-WORKDIR /app
-
+WORKDIR /dashboard
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_ROOT_USER_ACTION=ignore \
-    STREAMLIT_SERVER_PORT=8501 \
-    DATA_SERVICE_URL=http://tgdmserver:8000
+    STREAMLIT_SERVER_PORT=8501
 
 
 RUN apt-get update && \
@@ -33,4 +31,4 @@ COPY . .
 EXPOSE 8501
 
 
-CMD ["streamlit", "run", "/app/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
