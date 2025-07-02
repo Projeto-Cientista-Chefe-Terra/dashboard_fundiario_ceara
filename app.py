@@ -1,5 +1,6 @@
 # app.py
 
+# TODO URGENTE: Fazer a carga uma unica vez e ficar usando os DF/GDFs carregados
 # TODO Refatorar este código colocando as funções de tratamento de dados e rederizacao nos modulos
 # TODO Padronizar todoas as legendas
 # TODO Inserir nos mapas os mini-maps
@@ -7,6 +8,7 @@
 # TODO Inserir o "?" Em todos as secoes com explicacoes sobre o que e apresentado
 # TODO Unificar os data_loaders e refatorar
 # TODO Padronizar todas as tabelas para o estilo da tabela presente no Mapa de Gini
+
 
 import streamlit as st
 import pandas as pd
