@@ -1,5 +1,13 @@
 # app.py
 
+# TODO Refatorar este código colocando as funções de tratamento de dados e rederizacao nos modulos
+# TODO Padronizar todoas as legendas
+# TODO Inserir nos mapas os mini-maps
+# TODO Inserir a legenda e a cor de "<100 imoveis" nos mapas contextuais e Gini
+# TODO Inserir o "?" Em todos as secoes com explicacoes sobre o que e apresentado
+# TODO Unificar os data_loaders e refatorar
+# TODO Padronizar todas as tabelas para o estilo da tabela presente no Mapa de Gini
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -223,7 +231,7 @@ def mapa_de_Predominância():
         )
 
         # Tabela de dados do município
-        #st.markdown("##### Classificação dos Lotes")
+        #st.markdown("##### Classificação dos Imóveis")
         dados_muni = df_tabular[df_tabular["nome_municipio"] == municipio_selecionado]
         
         st.dataframe(
@@ -233,7 +241,7 @@ def mapa_de_Predominância():
                 "total": "Total"
             })
             .T.rename_axis("Categoria")
-            .rename(columns={dados_muni.index[0]: "Quantidade de Lotes"}),
+            .rename(columns={dados_muni.index[0]: "Quantidade de Imóveis"}),
             use_container_width=True
         )
 
@@ -281,6 +289,10 @@ def mapa_de_Predominância():
 
 
 ######################### Mapa Interativo da Malha Fundiária #########################
+
+#TODO Inserir o nome dos municipipios na cadama de delimitacao dos municipios
+
+
 def mapa_interativo():
     def simplify_geojson(geojson_data, tolerance=0.001):
         if not geojson_data or not geojson_data.get("features"):
@@ -400,6 +412,7 @@ def mapa_interativo():
 
 ######################### Mapa de Gini do Estado #########################
 
+#TODO Inserir o nome dos municipios e os limitadores em todos os municipios
 
 def mapa_gini():
     # Normalização de nomes
@@ -434,11 +447,12 @@ def mapa_gini():
     Q1, Q3 = areas.quantile([0.25, 0.75])
     IQR = Q3 - Q1
     out_iqr = df_props[(areas < Q1 - 1.5 * IQR) | (areas > Q3 + 1.5 * IQR)]
-
+    # out_err = df_props[df_props['area'] >= HALF_STATE_HA]
     HALF_STATE_HA = 1488860 / 2  # ~744430 ha
     out_err = df_props[
         (df_props["area"] >= HALF_STATE_HA) | (df_props["lote_id"] == 8601)
     ]
+
 
     # Prepara DataFrames para cálculos
     @st.cache_data
@@ -472,7 +486,7 @@ def mapa_gini():
         for df in [df_with, df_no]:
             df["cnt"] = df.groupby("nome_municipio")["area"].transform("count")
 
-        warning_munis = df_with[df_with["cnt"] == 1]["nome_municipio"].unique().tolist()
+        warning_munis = df_with[df_with["cnt"] < 100]["nome_municipio"].unique().tolist()
 
         return df_with, df_no, warning_munis
 
@@ -500,8 +514,8 @@ def mapa_gini():
     gini_no = calc_gini_df(df_no)
 
     # Filtra warnings do DataFrame de tabelas
-    gini_with_filt = gini_with[gini_with["cnt"] > 100]
-    #gini_no_filt = gini_no[gini_no["cnt"] > 100]
+    gini_with_filt = gini_with[gini_with["cnt"] > 1]
+    gini_no_filt = gini_no[gini_no["cnt"] > 1]
 
     # Cálculo de Gini estadual sem warnings mas incluindo outliers
     state_no_warn = gini(
@@ -510,13 +524,13 @@ def mapa_gini():
 
     # Merge GeoJSON + Gini
     geo_with = muni_geo.merge(gini_with, on="nome_municipio", how="left")
-    #geo_no = muni_geo.merge(gini_no, on="nome_municipio", how="left")
+    geo_no = muni_geo.merge(gini_no, on="nome_municipio", how="left")
 
     # Estilo de polígonos
     @st.cache_data
     def style_fn(f):
         p = f["properties"]
-        if p.get("cnt") < 100:
+        if p.get("cnt") == 1:
             return {
                 "fillColor": "#FFD700",
                 "color": "black",
@@ -543,10 +557,11 @@ def mapa_gini():
             c = "#6e1111"
         return {"fillColor": c, "color": "black", "weight": 0.5, "fillOpacity": 0.8}
 
-    col1, col2 = st.columns([6, 4])
+    col1, col2 = st.columns([7, 3])
 
     with col2:
         st.subheader("Índice de Gini ")
+
         circular_grafic = f"""
         <style>
         .grafico {{
@@ -588,7 +603,7 @@ def mapa_gini():
             f"<p style='text-align: center; color:black;'>Valor absoluto {state_no_warn:.4f}</p>",
             unsafe_allow_html=True,
         )
-    # Renderização de mapas
+# Renderização de mapas
     def render_map(tab, geo_df):
         with tab:
             m = folium.Map(
@@ -597,7 +612,7 @@ def mapa_gini():
 
             tooltip = GeoJsonTooltip(
                 fields=["nome_municipio_original", "gini_area", "cnt"],
-                aliases=["Município: ","Quantidade de Imóveis: ", "Índice de Gini: "],
+                aliases=["Município: ", "Índice de Gini: ", "Imóveis: "],
                 localize=True,
                 sticky=True,
             )
@@ -613,12 +628,11 @@ def mapa_gini():
                             html=f"""<div style='font-size:6pt; font-weight:bold; color:black; text-shadow:0 0 4px white;'>{row['nome_municipio']}</div>"""
                         ),
                     ).add_to(m)
-            # Adiciona aviso de lotes únicos
+            # Adiciona aviso de Imóveis únicos
             legend_html = """
                     <div style='position:fixed;top:10px;right:10px;background:white;padding:10px;border:1px solid grey;font-size:14px;z-index:9999;'>
-                    <b>Intervalos de Gini</b>
-                    <br><br>
-                    <i style='background:#FFD700;width:12px;height:12px;float:left;margin-right:4px'></i><100 imóveis<br>
+                    <b>Intervalos de Gini</b><br>
+                    <i style='background:#FFD700;width:12px;height:12px;float:left;margin-right:4px'></i>< 100 imóveis<br>
                     <i style='background:#f9c0ba;width:12px;height:12px;float:left;margin-right:4px'></i>≤0.700<br>
                     <i style='background:#d8948c;width:12px;height:12px;float:left;margin-right:4px'></i>0.701–0.800<br>
                     <i style='background:#b66960;width:12px;height:12px;float:left;margin-right:4px'></i>0.801–0.850<br>
@@ -629,13 +643,11 @@ def mapa_gini():
             m.get_root().html.add_child(folium.Element(legend_html))
             Fullscreen().add_to(m)
             st_folium(m, width=1000, height=900)
-
-######################### Estrutura Geral de Navegação #########################
     # Renderiza mapas
     render_map(col1, geo_with)
     # Tabelas
     with col2:
-        st.subheader("Tabela Gini por município")
+        st.subheader("Gini por município")
         st.dataframe(
             gini_with_filt[
                 ["regiao_administrativa", "nome_municipio_original", "cnt", "gini_area"]
@@ -643,92 +655,17 @@ def mapa_gini():
                 columns={
                     "regiao_administrativa": "Região",
                     "nome_municipio_original": "Município",
-                    "cnt": "# Lotes",
                     "gini_area": "Gini",
+                    "cnt": "Quantidade de Imoveis"
                 }
             ),
             use_container_width=True,
         )
 
-
-def sobre():
-    st.markdown(
-        """
-    Aplicação de painéis contendo dados estatísticos e geoespaciais da malha fundiária cearense desenvolvido, principalmente, a partir dos dados cadastrados no Instituto de Desenvolvimento Agrário do Ceará (IDACE). Este software faz parte das ações realizadas no âmbito do projeto **Cientista Chefe Terra  de Governança Fundiária e Ambiental**, parceria entre o IDACE, a Universidade Federal do Ceará (UFC) e a Fundação Cearense de Apoio ao Desenvolvimento Científico e Tecnológico (Funcap).
-    """
-    )
-
-    # Coordenadora Geral
-    st.subheader("Coordenadora Geral")
-    st.markdown(
-        """    
-    Profa. Maria Inês Escobar da Costa (EcoEco-UFC)
-    """
-    )
-
-    # Equipe de Desenvolvimento
-    st.subheader("Equipe de Desenvolvimento")
-    st.markdown(
-        """
-    Nossa equipe é composta por:
-    - Prof. Wellington Wagner Ferreira Sarmento (SMD-UFC)
-    - Me. Patrícia de Sousa Paula (Doutoranda MDCC-UFC)
-    - André Lucas de Oliveira Domingues (SMD-UFC)
-    - Wesley Barbosa Martins Ribeiro (SMD-UFC)
-    """
-    )
-
-    # Licença de Uso
-    st.subheader("Licença de Uso")
-    st.markdown(
-        """
-    [GNU General Public License (GPL)](https://github.com/Projeto-Cientista-Chefe-Terra/dashboard_fundiario_ceara/blob/main/LICENSE)
-    """
-    )
-
-    # Link para o projeto
-    st.header("Cientista Chefe Terra de Governança Fundiária e Ambiental")
-    st.markdown("#### Site Institucional")
-    st.markdown("https://ccterra-site.vercel.app")
-    st.markdown("#### Código Fonte")
-    st.markdown("https://github.com/Projeto-Cientista-Chefe-Terra")
-
-    st.header("Apoio")
-    col1, col2, col3, col4 = st.columns(4, vertical_alignment='center')
-
-    with col1:
-        st.image("./assets/Idace.png", width=150)
-        
-
-    with col2:
-        st.image("./assets/CC_Terra.png", width=150)
-
-
-    with col3:
-        st.image("./assets/funcap.png", width=150)
-        
-    with col4:
-        st.image("./assets/ufc_logo.png", width=150)
-        
-
-def mapa_hidrográfico():
-    centro = [-5.4984, -39.3200]
-    mapa = folium.Map(location=centro, zoom_start=7)
-    map_container = st.empty()
-    st.session_state.mapa_obj = mapa
-
-    # Camada 3 - Exibição
-    with map_container:
-        st_folium(
-            st.session_state.mapa_obj,
-            key=f"ctx_map_v",
-            width=900,
-            height=600,
-            returned_objects=["last_clicked"],  # Só retorna o necessário
-        )
+######################### Mapa de Assentamentos do Estado ######################
 
 def mapa_Assentamentos():
-    # Cores para diferentes tipos de assentamento
+ 
     CORES_ASSENTAMENTOS = {
         "Estadual": "#ff7f0e",
         "Federal": "#1f77b4",
@@ -885,33 +822,93 @@ def mapa_Assentamentos():
                 returned_objects=[]
             )
         else:
-            st.warning("Nenhum dado disponível para os filtros selecionados.")
+            st.warning("Nenhum dado disponível para os filtros selecionados.")     
+            
+            
+
+######################### Mapa de Hidrográfico do Estado #######################
+
+def mapa_hidrográfico():
+    centro = [-5.4984, -39.3200]
+    mapa = folium.Map(location=centro, zoom_start=7)
+    map_container = st.empty()
+    st.session_state.mapa_obj = mapa
+
+    # Camada 3 - Exibição
+    with map_container:
+        st_folium(
+            st.session_state.mapa_obj,
+            key=f"ctx_map_v",
+            width=900,
+            height=600,
+            returned_objects=["last_clicked"],  # Só retorna o necessário
+        )
+
+
+
+######################### Estrutura Geral de Navegação #########################
+
+
+
+def sobre():
+    st.markdown(
+        """
+    Aplicação de painéis contendo dados estatísticos e geoespaciais da malha fundiária cearense desenvolvido, principalmente, a partir dos dados cadastrados no Instituto de Desenvolvimento Agrário do Ceará (IDACE). Este software faz parte das ações realizadas no âmbito do projeto **Cientista Chefe Terra  de Governança Fundiária e Ambiental**, parceria entre o IDACE, a Universidade Federal do Ceará (UFC) e a Fundação Cearense de Apoio ao Desenvolvimento Científico e Tecnológico (Funcap).
+    """
+    )
+
+    # Coordenadora Geral
+    st.subheader("Coordenadora Geral")
+    st.markdown(
+        """    
+    Profa. Maria Inês Escobar da Costa (EcoEco-UFC)
+    """
+    )
+
+    # Equipe de Desenvolvimento
+    st.subheader("Equipe de Desenvolvimento")
+    st.markdown(
+        """
+    Nossa equipe é composta por:
+    - Prof. Wellington Wagner Ferreira Sarmento (SMD-UFC)
+    - Me. Patrícia de Sousa Paula (Doutoranda MDCC-UFC)
+    - André Lucas de Oliveira Domingues (SMD-UFC)
+    - Wesley Barbosa Martins Ribeiro (SMD-UFC)
+    """
+    )
+
+    # Licença de Uso
+    st.subheader("Licença de Uso")
+    st.markdown(
+        """
+    [GNU General Public License (GPL)](https://github.com/Projeto-Cientista-Chefe-Terra/dashboard_fundiario_ceara/blob/main/LICENSE)
+    """
+    )
+
+    # Link para o projeto
+    st.header("Cientista Chefe Terra de Governança Fundiária e Ambiental")
+    st.markdown("#### Site Institucional")
+    st.markdown("https://ccterra-site.vercel.app")
+    st.markdown("#### Código Fonte")
+    st.markdown("https://github.com/Projeto-Cientista-Chefe-Terra")
+
+    st.header("Apoio")
+    col1, col2, col3, col4 = st.columns(4, vertical_alignment='center')
+
+    with col1:
+        st.image("./assets/Idace.png", width=150)
+        
 
     with col2:
-        st.markdown(f"### Filtros")
+        st.image("./assets/CC_Terra.png", width=150)
 
-        # Carrega municípios
-        municipio_selecionado = st.selectbox(
-            "Selecione o município:",
-            municipios,
-            index=0
-        )    
-        st.markdown("---")
 
-        st.markdown("### Informações")
-        # Resumo estatístico
-        areas = [f['properties'].get('area', 0) for f in geojson_data['features']]
-        if geojson_data and geojson_data.get("features") and municipio_selecionado == 'Todos': 
-            st.metric("Total de assentamentos", len(areas))
-            st.metric("Área média (ha)", round(sum(areas)/len(areas), 2))
-            st.metric("Área total (ha)", round(sum(areas), 2))
-        else:
-            st.metric("Total de assentamentos", len(areas))
-            st.metric("Área total (ha)", round(sum(areas), 2))
-        st.markdown("---")
-        for tipo, cor in CORES_ASSENTAMENTOS.items():
-            st.markdown(f"<span style='color:{cor}; font-weight:bold'>■</span> {tipo}", unsafe_allow_html=True)
-
+    with col3:
+        st.image("./assets/funcap.png", width=150)
+        
+    with col4:
+        st.image("./assets/ufc_logo.png", width=150)
+        
 
 
 # ---------------------------------------------------
