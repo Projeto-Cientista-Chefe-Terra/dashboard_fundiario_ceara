@@ -97,7 +97,6 @@ preparar_dados_ctx = st.cache_resource()(preparar_dados)
 # 0) Definição de funções de visualizações
 # ---------------------------------------------------
 
-# DATA_FOLDER = "data/"
 
 CORES = {
     "Pequena Propriedade < 1 MF": "#fecc5c",
