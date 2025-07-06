@@ -255,6 +255,8 @@ def mapa_de_Predominância():
             cores=CORES,
             contorno_municipios=contorno_municipios
         )
+        #Adicionando minimap
+        MiniMap(toggle_display=True).add_to(mapa_obj)
         Fullscreen().add_to(mapa_obj)
         st_folium(mapa_obj, width=1200, height=600)
 
@@ -405,6 +407,8 @@ def mapa_interativo():
         with col1:
             with st.spinner("Gerando mapa..."):
                 folium.LayerControl(collapsed=False).add_to(m)
+                #Adicionando minimap
+                MiniMap(toggle_display=True).add_to(m)
                 Fullscreen().add_to(m)
                 st_folium(m, width=1200, height=900, returned_objects=[])
             
@@ -642,6 +646,8 @@ def mapa_gini():
                     <i style='background:#D3D3D3;width:12px;height:12px;float:left;margin-right:4px'></i>Sem dados
                     </div>"""
             m.get_root().html.add_child(folium.Element(legend_html))
+            #Adicionando minimap
+            MiniMap(toggle_display=True).add_to(m)
             Fullscreen().add_to(m)
             st_folium(m, width=1000, height=900)
     # Renderiza mapas
