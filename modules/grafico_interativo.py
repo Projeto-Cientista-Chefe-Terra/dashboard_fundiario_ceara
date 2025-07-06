@@ -19,7 +19,7 @@ import streamlit as st
 # Add this near the top of the code (with other constants)
 
 
-CORES = cores
+CORES = cores.copy()
 CORES["Sem Registro"] = "#9fa2a5"
 
 
@@ -157,3 +157,58 @@ def compute_stats_df(df: pd.DataFrame) -> pd.DataFrame:
         .reset_index()
         .rename(columns={"index": "Estatística"})
     )
+
+def render_view_grafico_interativo(df_class):
+    col1, col2 = st.columns([6, 4])
+    tab1, tab2 = col1.tabs(["Gráfico de Pizza","Gráfico de Barras"])
+    col2.subheader("").markdown("##### Filtrar por:")
+    co2_1, co2_2 = col2.columns([1, 1])
+    opcao = co2_1.selectbox(
+        "Filtrar por:", 
+        ["Todo o Estado", "Municípios", "Regiões Administrativas"],
+        label_visibility="hidden"
+    )
+    entidade = ""
+    if opcao != "Todo o Estado":
+        col = "nome_municipio" if opcao == "Municípios" else "regiao_administrativa"
+        entidade = co2_2.selectbox(f"{opcao}:", sorted(df_class[col].dropna().unique()))
+
+    df_filtrado = filtrar_dados(df_class, opcao, entidade)
+    resultados, total = classificar_propriedades(df_filtrado)
+
+    def preencher_tabs():
+        fig_pizza = plot_pizza(
+            resultados, f"Propriedades - {opcao} - {entidade}", f"Total: {total}"
+        )
+        fig_barra = plot_barras(
+            resultados, f"Propriedades - {opcao} - {entidade}", f"Total: {total}"
+        )
+
+
+        tab1.pyplot(fig_pizza)
+        tab2.pyplot(fig_barra)
+        
+
+        col2.subheader("").markdown("#### Classificação de Propriedades")
+        col2.html(f"""
+                  <p id="op-ent"><b>[{opcao}]</b>{entidade} </p>
+                  """)
+        col2.table(df_tab)
+
+        col2.subheader("").markdown("#### Estatísticas Gerais")
+        col2.table(compute_stats_df(df_class))
+
+
+    if resultados:
+        st.html("<h5>Dados atualizadoe em 24/02/2025</h5>")
+        df_tab = pd.DataFrame(
+            list(resultados.items()), columns=["Categoria", "Quantidade"]
+        )
+        df_tab.loc[len(df_tab)] = ["Total", total]
+
+        # Tabs
+        preencher_tabs()
+
+    else:
+        st.warning("Nenhum dado disponível para o filtro selecionado.")
+

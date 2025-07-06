@@ -10,16 +10,27 @@ from .grafico_interativo import (
     classificar_propriedades,
     plot_barras,
     plot_pizza,
-    compute_stats_df
+    compute_stats_df,
+    render_view_grafico_interativo
 )
-from .mapa_contextual import (
+from .mapa_predominancia import (
     preparar_dados,
-    criar_mapa_contextual
+    criar_mapa_contextual,
+    render_view_predominancia_map
 )
-# from .mapa_interativo import (
-#     preprocessar_tudo,
-#     criar_mapa_com_camadas
-# )
+
+from .mapa_assentamento import (
+    render_view_assentamento_map
+)
+
+from .mapa_interativo import (
+    render_view_mapa_interativo
+)
+
+
+from .mapa_gini import (
+    render_view_gini_map
+)
 
 # Version of the modules package
 __version__ = "1.0.0"
@@ -44,7 +55,13 @@ __all__ = [
     "preparar_dados", 
     "criar_mapa_contextual",
     
-   
     # Configuration
-    "DATA_SERVICE_URL"
+    "DATA_SERVICE_URL",
+    
+    # views
+    "render_view_predominancia_map",
+    "render_view_mapa_interativo",
+    "render_view_grafico_interativo",
+    "render_view_gini_map",
+    "render_view_assentamento_map"
 ]
