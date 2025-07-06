@@ -8,13 +8,7 @@ from typing import TypedDict
 from folium.plugins import MiniMap, Fullscreen
 
 from streamlit_folium import st_folium
-
-
-
-from public.cores import CORES as cores
-
-CORES = cores.copy()
-CORES["Sem Registros"] = '#eeeee4'
+from public.cores import CORES 
 
 
 class DebugInfo(TypedDict):

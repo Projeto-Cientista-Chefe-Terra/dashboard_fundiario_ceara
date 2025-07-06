@@ -12,10 +12,7 @@ from modules.data_loader_aux import (
     fetch_geojson_limites
 )
 
-from public.cores import CORES as cores
-
-CORES = cores.copy()
-CORES["Sem Registros"] = '#eeeee4'
+from public.cores import CORES 
 
 
 def simplify_geojson(geojson_data, tolerance=0.001):

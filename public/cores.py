@@ -3,4 +3,5 @@ CORES = {
     "Pequena Propriedade": "#fd8d3c",
     "Média Propriedade": "#f03b20",
     "Grande Propriedade": "#bd0026",
+    "Sem Registros": '#eeeee4'
 }

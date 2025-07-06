@@ -12,15 +12,9 @@ Funções para gerar os gráficos de classificação:
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from public.cores import CORES as cores
+from public.cores import CORES
 import streamlit as st
 
-
-# Add this near the top of the code (with other constants)
-
-
-CORES = cores.copy()
-CORES["Sem Registro"] = "#9fa2a5"
 
 
 @st.cache_data
