@@ -1,4 +1,9 @@
 # app.py
+
+# OBservações
+#  st_folium(m, width=1000, height=900, returned_objects=[]) returned_objects -> serve para o mapa não
+# retornar nada.
+
 import streamlit as st
 from streamlit_folium import st_folium
 import folium
