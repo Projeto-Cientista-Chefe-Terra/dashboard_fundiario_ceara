@@ -1,25 +1,12 @@
 import streamlit as st
 import pandas as pd
-import geopandas as gpd
 import unicodedata
 import folium
 import numpy as np
-import os
-from datetime import datetime
 from folium.features import GeoJsonTooltip
 from shapely.geometry import Polygon, MultiPolygon
 from streamlit_folium import st_folium
 from folium.plugins import MiniMap, Fullscreen
-
-from modules import (
-    load_csv_data as load_data,
-    load_municipios,
-    load_municipios
-)
-# ——————————————————————————————————————————————
-# # Configurações iniciais
-# st.set_page_config(layout="wide")
-# st.title("Mapa de Gini da Malha Fundiária do Ceará")
 
 @st.cache_data
 def normalizar_nome(nome):
@@ -164,7 +151,7 @@ def render_map(tab, geo_df):
         #Adicionando minimap
         MiniMap(toggle_display=True).add_to(m)
         Fullscreen().add_to(m)
-        st_folium(m, width=1000, height=900)
+        st_folium(m, width=1000, height=900, returned_objects=[])
 
 def render_view_gini_map(df_props,municipios):
     # Carrega dados
@@ -189,11 +176,11 @@ def render_view_gini_map(df_props,municipios):
     df_with, df_no, warning_munis = contar_lotes(df_with, df_no)
     
     gini_with = calc_gini_df(df_with)
-    gini_no = calc_gini_df(df_no)
+    # gini_no = calc_gini_df(df_no)
 
     # Filtra warnings do DataFrame de tabelas
     gini_with_filt = gini_with[gini_with["cnt"] > 1]
-    gini_no_filt = gini_no[gini_no["cnt"] > 1]
+    # gini_no_filt = gini_no[gini_no["cnt"] > 1]
 
     # Cálculo de Gini estadual sem warnings mas incluindo outliers
     state_no_warn = gini(
@@ -202,11 +189,12 @@ def render_view_gini_map(df_props,municipios):
 
     # Merge GeoJSON + Gini
     geo_with = muni_geo.merge(gini_with, on="nome_municipio", how="left")
-    geo_no = muni_geo.merge(gini_no, on="nome_municipio", how="left")
+    # geo_no = muni_geo.merge(gini_no, on="nome_municipio", how="left")
     
     
     col1, col2 = st.columns([7, 3])
 
+    # Tabelas
     with col2:
         st.subheader("Índice de Gini ")
 
@@ -251,12 +239,6 @@ def render_view_gini_map(df_props,municipios):
             f"<p style='text-align: center; color:black;'>Valor absoluto {state_no_warn:.4f}</p>",
             unsafe_allow_html=True,
         )
-        
-    
-# Renderiza mapas
-    render_map(col1, geo_with)
-    # Tabelas
-    with col2:
         st.subheader("Gini por município")
         st.dataframe(
             gini_with_filt[
@@ -272,6 +254,6 @@ def render_view_gini_map(df_props,municipios):
             use_container_width=True,
         )
         
-        
-
+# Renderiza mapas
+    render_map(col1, geo_with)
 
