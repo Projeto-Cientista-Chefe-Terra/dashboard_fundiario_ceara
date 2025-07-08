@@ -6,7 +6,7 @@ import geopandas as gpd
 
 from streamlit_folium import st_folium
 from folium.plugins import Fullscreen, MiniMap
-from modules.data_loader_aux import (
+from modules.data_loader import (
     fetch_regioes, fetch_municipios,
     fetch_geojson_por_regiao, fetch_geojson_por_municipio,
     fetch_geojson_limites
