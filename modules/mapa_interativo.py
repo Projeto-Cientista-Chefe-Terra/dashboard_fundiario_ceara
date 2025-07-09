@@ -112,8 +112,8 @@ def render_view_mapa_interativo():
                     'fillColor': cor, 'color': '#000', 'weight': 0.5, 'fillOpacity': 0.6
                 },
                 tooltip=folium.GeoJsonTooltip(
-                    fields=['imovel','data_criacao_lote', 'numero_incra','numero_lote', 'area','situacao_juridica','regiao_administrativa','nome_municipio_original', 'distrito', 'localidade', 'categoria'],
-                    aliases=['Nome:','Data de Criação:','N° Incra:','N° Lote:','Área (ha):','Situação Jurídica:','Região Administrativa:','Município:', 'Distrito:', 'Localidade:', 'Categoria:'],
+                    fields=['imovel','data_criacao_lote', 'numero_incra','numero_lote', 'area','situacao_juridica','regiao_administrativa','nome_municipio_original', 'categoria'],
+                    aliases=['Nome:','Data de Criação:','N° Incra:','N° Lote:','Área (ha):','Situação Jurídica:','Região Administrativa:','Município:', 'Categoria:'],
                     localize=True
                 )
             ).add_to(fg)

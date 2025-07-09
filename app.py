@@ -25,7 +25,8 @@ from modules import (
     render_view_gini_map,
     render_view_grafico_interativo,
     render_view_mapa_interativo,
-    render_view_predominancia_map
+    render_view_predominancia_map,
+    render_view_reservatorios_map
 )
 
 
@@ -118,20 +119,8 @@ def mapa_Assentamentos():
 
 ######################### Mapa de Hidrográfico do Estado #######################
 def mapa_hidrográfico():
-    centro = [-5.4984, -39.3200]
-    mapa = folium.Map(location=centro, zoom_start=7)
-    map_container = st.empty()
-    st.session_state.mapa_obj = mapa
+    render_view_reservatorios_map()
 
-    # Camada 3 - Exibição
-    with map_container:
-        st_folium(
-            st.session_state.mapa_obj,
-            key=f"ctx_map_v",
-            width=900,
-            height=600,
-            returned_objects=["last_clicked"],  # Só retorna o necessário
-        )
 
 
 ######################### Sobre o projeto  #######################
