@@ -4,7 +4,7 @@ import requests
 import streamlit as st
 
 # URL base do seu microserviço
-BASE_URL = st.secrets.get("TERRAGEO_URL", "http://0.0.0.0:8000")
+BASE_URL = st.secrets.get("DATA_SERVICE_URL", "http://localhost:8000")
 
 @st.cache_data(ttl=3600)
 def fetch_regioes() -> list[str]:

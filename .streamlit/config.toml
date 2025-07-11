@@ -8,7 +8,7 @@ runOnSave = true
 port = 8501
 fileWatcherType = "auto"
 enableWebsocketCompression = false
-disconnectedSessionTTL = 120
+#disconnectedSessionTTL = 120
 
 [theme]
 base                     = "light"

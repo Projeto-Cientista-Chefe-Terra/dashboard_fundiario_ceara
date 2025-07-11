@@ -41,7 +41,7 @@ def formatar_valor(valor):
 def carregar_geojson(municipio: str = "todos", tipo: str = "todos", tolerancia: float = 0.001) -> Optional[dict]:
     """Carrega dados GeoJSON da API com filtros"""
     try:
-        url = f"http://localhost:8000/geojson_assentamentos?municipio={municipio}&tipo={tipo}&tolerance={tolerancia}"
+        url = f"http://tgdmserver:8000/geojson_assentamentos?municipio={municipio}&tipo={tipo}&tolerance={tolerancia}"
         response = requests.get(url, timeout=30)
         response.raise_for_status()
         return response.json()
@@ -194,7 +194,7 @@ def adicionar_camadas(mapa: folium.Map, geojson_data: dict, tipo_filtrado: str =
 def obter_municipios() -> list:
     """Obtém lista de municípios da API"""
     try:
-        url = "http://localhost:8000/assentamentos_municipios"
+        url = "http://tgdmserver:8000/assentamentos_municipios"
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         return response.json().get("municipios", [])

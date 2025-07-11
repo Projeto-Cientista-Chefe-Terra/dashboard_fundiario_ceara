@@ -89,7 +89,7 @@ def carregar_municipios(municipio: str = "todos") -> Optional[dict]:
 @st.cache_data(ttl=3600)
 def obter_municipios_reservatorios() -> list:
     try:
-        resp = requests.get("http://localhost:8000/reservatorios_municipios", timeout=10)
+        resp = requests.get("http://tgdmserver:8000/reservatorios_municipios", timeout=10)
         resp.raise_for_status()
         return resp.json().get("municipios", [])
     except requests.exceptions.RequestException:
