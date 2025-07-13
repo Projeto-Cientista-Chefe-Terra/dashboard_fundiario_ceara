@@ -168,7 +168,7 @@ def sobre():
     st.markdown("https://github.com/Projeto-Cientista-Chefe-Terra")
 
     st.header("Apoio")
-    col1, col2, col3, col4 = st.columns(4, vertical_alignment='center')
+    col1, col2, col3, col4 = st.columns(4, vertical_alignment='center', )
 
     with col1:
         st.image("./assets/Idace.png", width=150)
@@ -177,7 +177,7 @@ def sobre():
         st.image("./assets/CC_Terra.png", width=150)
 
     with col3:
-        st.image("./assets/funcap.png", width=150)
+        st.image("./assets/funcap.png", width=250)
         
     with col4:
         st.image("./assets/ufc_logo.png", width=150)
