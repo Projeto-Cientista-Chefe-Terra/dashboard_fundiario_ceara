@@ -5,4 +5,4 @@
 # TODO Inserir a legenda e a cor de "<100 imoveis" nos mapas contextuais e Gini
 # TODO Inserir o "?" (Seção de "O que esse mapa é") Em todos as secoes com explicacoes sobre o que e apresentado
 # DONE Unificar os data_loaders e refatorar 
-# TODO Padronizar todas as tabelas para o estilo da tabela presente no Mapa de predominancia
+# DONE Padronizar todas as tabelas para o estilo da tabela presente no Mapa de predominancia

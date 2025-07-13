@@ -187,10 +187,10 @@ def render_view_grafico_interativo(df_class):
         col2.html(f"""
                   <p id="op-ent"><b>[{opcao}]</b>{entidade} </p>
                   """)
-        col2.table(df_tab)
+        col2.dataframe(df_tab, use_container_width=True, hide_index=True,)
 
         col2.subheader("").markdown("#### Estatísticas Gerais")
-        col2.table(compute_stats_df(df_class))
+        col2.dataframe(compute_stats_df(df_class), use_container_width=True, hide_index=True,)
 
 
     if resultados:

@@ -125,6 +125,6 @@ def render_view_mapa_interativo():
                 #Adicionando minimap
                 MiniMap(toggle_display=True).add_to(m)
                 Fullscreen().add_to(m)
-                st_folium(m, width=1200, height=900, returned_objects=[])
+                st_folium(m, width=1200, height=900, returned_objects=[],use_container_width=True)
             
         st.stop()   

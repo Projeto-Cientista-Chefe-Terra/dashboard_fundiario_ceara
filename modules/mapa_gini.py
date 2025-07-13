@@ -8,12 +8,14 @@ from shapely.geometry import Polygon, MultiPolygon
 from streamlit_folium import st_folium
 from folium.plugins import MiniMap, Fullscreen
 
+
 @st.cache_data
 def normalizar_nome(nome):
     if not isinstance(nome, str):
         return nome
     s = unicodedata.normalize("NFKD", nome).encode("ASCII", "ignore").decode()
     return s.lower().replace(" ", "_").upper()
+
 
 # Cálculo de Gini
 @st.cache_data
@@ -38,6 +40,7 @@ def processar_dataframes(df_props, out_iqr, out_err):
 
     return df_with, df_no
 
+
 @st.cache_data
 def normalizar_df(df):
     """Normaliza apenas DataFrames comuns"""
@@ -45,6 +48,7 @@ def normalizar_df(df):
     df["nome_municipio_original"] = df["nome_municipio"]
     df["nome_municipio"] = df["nome_municipio"].apply(normalizar_nome)
     return df
+
 
 def normalizar_municipios(municipios):
     """Função sem cache para GeoDataFrame"""
@@ -78,7 +82,6 @@ def calc_gini_df(df):
     )
 
 
-
 # Estilo de polígonos
 @st.cache_data
 def style_fn(f):
@@ -110,12 +113,11 @@ def style_fn(f):
         c = "#6e1111"
     return {"fillColor": c, "color": "black", "weight": 0.5, "fillOpacity": 0.8}
 
+
 # Renderização de mapas
 def render_map(tab, geo_df):
     with tab:
-        m = folium.Map(
-            location=[-5.2, -39.5], zoom_start=8, tiles="cartodbpositron"
-        )
+        m = folium.Map(location=[-5.2, -39.5], zoom_start=8, tiles="cartodbpositron")
 
         tooltip = GeoJsonTooltip(
             fields=["nome_municipio_original", "gini_area", "cnt"],
@@ -123,7 +125,7 @@ def render_map(tab, geo_df):
             localize=True,
             sticky=True,
         )
-
+        # m.add_child(folium.ClickForLatLng(format_str='"Latitude: " + lat + ", Longitude: " + lng',alert=True  ))
         folium.GeoJson(geo_df, style_function=style_fn, tooltip=tooltip).add_to(m)
         for _, row in geo_df.iterrows():
             geom = row.geometry
@@ -148,16 +150,18 @@ def render_map(tab, geo_df):
                 <i style='background:#D3D3D3;width:12px;height:12px;float:left;margin-right:4px'></i>Sem dados
                 </div>"""
         m.get_root().html.add_child(folium.Element(legend_html))
-        #Adicionando minimap
+        # Adicionando minimap
         MiniMap(toggle_display=True).add_to(m)
         Fullscreen().add_to(m)
-        st_folium(m, width=1000, height=900, returned_objects=[])
+        st_folium(
+            m, width=1200, height=900, returned_objects=[], use_container_width=True
+        )
 
-def render_view_gini_map(df_props,municipios):
+
+def render_view_gini_map(df_props, municipios):
     # Carrega dados
     # df_props = load_data("")
     # municipios = load_municipios("")
-
 
     # Detecta outliers via IQR para uso interno
     areas = df_props["area"]
@@ -167,14 +171,15 @@ def render_view_gini_map(df_props,municipios):
     # out_err = df_props[df_props['area'] >= HALF_STATE_HA]
     HALF_STATE_HA = 1488860 / 2  # ~744430 ha
     out_err = df_props[
-        (df_props["area"] >= HALF_STATE_HA) | (df_props["lote_id"] == 8601)]
-    
+        (df_props["area"] >= HALF_STATE_HA) | (df_props["lote_id"] == 8601)
+    ]
+
     df_with, df_no = processar_dataframes(df_props, out_iqr, out_err)
     df_with = normalizar_df(df_with)
     df_no = normalizar_df(df_no)
     muni_geo = normalizar_municipios(municipios)
     df_with, df_no, warning_munis = contar_lotes(df_with, df_no)
-    
+
     gini_with = calc_gini_df(df_with)
     # gini_no = calc_gini_df(df_no)
 
@@ -190,15 +195,16 @@ def render_view_gini_map(df_props,municipios):
     # Merge GeoJSON + Gini
     geo_with = muni_geo.merge(gini_with, on="nome_municipio", how="left")
     # geo_no = muni_geo.merge(gini_no, on="nome_municipio", how="left")
-    
-    
+
+    state_no_warn_no_dot = str(state_no_warn).replace(".", ",")
     col1, col2 = st.columns([7, 3])
 
     # Tabelas
     with col2:
         st.subheader("Índice de Gini ")
 
-        circular_grafic = f"""
+        circular_grafic = (
+            f"""
         <style>
         .grafico {{
             --porcentagem: {state_no_warn:.2f};  # Usando o valor da sua métrica
@@ -218,7 +224,13 @@ def render_view_gini_map(df_props,municipios):
         }}
 
         .grafico::before {{
+            """
+            + f"""
             content: "{state_no_warn:.2%}";  # Formata como porcentagem
+            """.replace(
+                ".", ","
+            )
+            + """
             display: grid;
             place-items: center;
             width: 70%;
@@ -231,12 +243,15 @@ def render_view_gini_map(df_props,municipios):
 
         <div class="grafico" data-value="{state_no_warn:.0%}"></div>
         """
+        )
         st.markdown(
             circular_grafic,
             unsafe_allow_html=True,
         )
         st.markdown(
-            f"<p style='text-align: center; color:black;'>Valor absoluto {state_no_warn:.4f}</p>",
+            f"<p style='text-align: center; color:black;'>Valor absoluto {state_no_warn:.4f}</p>".replace(
+                ".", ","
+            ),
             unsafe_allow_html=True,
         )
         st.subheader("Gini por município")
@@ -248,12 +263,12 @@ def render_view_gini_map(df_props,municipios):
                     "regiao_administrativa": "Região",
                     "nome_municipio_original": "Município",
                     "gini_area": "Gini",
-                    "cnt": "Quantidade de Imoveis"
+                    "cnt": "Quantidade de Imoveis",
                 }
             ),
             use_container_width=True,
+            hide_index=True,
         )
-        
-# Renderiza mapas
-    render_map(col1, geo_with)
 
+    # Renderiza mapas
+    render_map(col1, geo_with)

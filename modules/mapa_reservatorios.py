@@ -209,25 +209,36 @@ def adicionar_camada_assentamentos(mapa: folium.Map, geojson_data: dict):
     fg.add_to(mapa)
 
 
-def adicionar_camada_municipios(mapa: folium.Map, geojson_data: dict):
+def adicionar_camada_municipios(mapa: folium.Map, geojson_data: dict, with_tooltip: bool = True):
     if not geojson_data or not geojson_data.get("features"):
         return
 
     fg = folium.FeatureGroup(name="Limites Municipais", overlay=True)
-    folium.GeoJson(
-        geojson_data,
-        style_function=lambda ft: {
-            "fill": False,
-            "color": COR_MUNICIPIO,
-            "weight": 1
-        },
-        simplify_tolerance=0.001,
-        tooltip=folium.GeoJsonTooltip(
-            fields=['nome_municipio'],
-            aliases=['Município:'],
-            sticky=True
-        )
-    ).add_to(fg)
+    if with_tooltip:
+        folium.GeoJson(
+            geojson_data,
+            style_function=lambda ft: {
+                "fill": False,          
+                "color": COR_MUNICIPIO,
+                "weight": 1
+            },
+            simplify_tolerance=0.001,
+            tooltip=folium.GeoJsonTooltip(
+                fields=['nome_municipio'],
+                aliases=['Município:'],
+                sticky=True
+            )
+        ).add_to(fg)
+    else:
+        folium.GeoJson(
+            geojson_data,
+            style_function=lambda ft: {
+                "fill": False,          
+                "color": COR_MUNICIPIO,
+                "weight": 1
+            },
+            simplify_tolerance=0.001
+        ).add_to(fg)
     fg.add_to(mapa)
     
 # def adicionar_camada_municipios(mapa: folium.Map, geojson_data: dict):
@@ -304,10 +315,10 @@ def render_view_reservatorios_map():
             carregar_reservatorios(sel if sel != "Todos" else "todos")
         )
         st.metric("Reservatórios", stats["total"])
-        st.metric("Capacidade total (m³)", f"{stats['cap_total_m³']:.2f}")
-        st.metric("Área total (ha)", f"{stats['area_ha']:.2f}")
+        st.metric("Capacidade total (m³)", f"{stats['cap_total_m³']:.2f}".replace('.', ','))
+        st.metric("Área total (ha)", f"{stats['area_ha']:.2f}".replace('.', ','))
 
-    with col1:
+    with col1:  
         if "geo_muni" not in st.session_state:
             st.session_state.geo_muni = carregar_municipios("todos")
         if "geo_assent" not in st.session_state:
@@ -326,5 +337,5 @@ def render_view_reservatorios_map():
         folium.LayerControl(collapsed=False).add_to(mapa)
         MiniMap(toggle_display=True).add_to(mapa)
         Fullscreen().add_to(mapa)
-        st_folium(mapa, width=1000, height=800, returned_objects=[])
+        st_folium(mapa, width=1000, height=800, returned_objects=[], use_container_width=True)
 

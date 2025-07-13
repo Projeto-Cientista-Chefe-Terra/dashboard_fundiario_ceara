@@ -6,6 +6,8 @@ import requests
 from typing import Optional
 import math
 
+from modules.mapa_reservatorios import adicionar_camada_municipios, carregar_municipios
+
 
 CORES_ASSENTAMENTOS = {
     "Estadual": "#ff7f0e",  # Laranja
@@ -63,83 +65,72 @@ def adicionar_camadas(mapa: folium.Map, geojson_data: dict, tipo_filtrado: str =
     if not geojson_data or not geojson_data.get("features"):
         st.warning("Nenhum dado de assentamento para exibir.")
         return
-    
-    # Filtra features pelo tipo selecionado (se não for "todos")
+
     features = geojson_data['features']
     if tipo_filtrado != "todos":
         features = [f for f in features if f['properties'].get('tipo_assentamento', '').lower() == tipo_filtrado.lower()]
-    
+
     # Pré-processa as features para formatar os valores e garantir campos mínimos
     campos_minimos = [
         'cd_sipra', 'tipo_assentamento', 'nome_assentamento', 
         'nome_municipio_original', 'num_familias', 'forma_obtecao', 
         'area', 'perimetro'
     ]
-    
+
     for feature in features:
         props = feature['properties']
-        
-        # Garante que todos os campos mínimos existam
         for campo in campos_minimos:
             if campo not in props:
                 props[campo] = "Não Disponível"
             else:
                 props[campo] = formatar_valor(props[campo])
-    
-    # Cria um novo GeoJSON apenas com as features filtradas
-    filtered_geojson = {
-        "type": "FeatureCollection",
-        "features": features
-    }
-    
-    # Verifique os campos disponíveis na primeira feature
-    if features:
-        available_fields = list(features[0]['properties'].keys())
-    else:
-        available_fields = []
-    
-    # Defina os campos a serem usados com fallback
-    tooltip_fields = campos_minimos
-    
-    # Filtre apenas campos disponíveis
-    fields_to_use = [f for f in tooltip_fields if f in available_fields]
-    
-    # Crie aliases correspondentes
-    aliases_map = {
-        'cd_sipra': 'Cd_SIPRA: ',
-        'tipo_assentamento': 'Tipo: ',
-        'nome_assentamento': 'Assentamento: ',
-        'nome_municipio_original': 'Município: ',
-        'num_familias': 'Famílias: ',
-        'forma_obtecao': 'Forma de Obtenção: ',
-        'area': 'Área (ha): ',
-        'perimetro': 'Perímetro (km): '
-    }
-    aliases_to_use = [aliases_map.get(f, f) for f in fields_to_use]
 
-    # Camada GeoJSON com tooltip adaptável
-    folium.GeoJson(
-        filtered_geojson,
-        name="Assentamentos",
-        style_function=lambda feature: {
-            'fillColor': CORES_ASSENTAMENTOS.get(
-                feature['properties'].get('tipo_assentamento', 'Outros').capitalize(),
-                "#ff7f0e"  # Cor padrão
-            ),
-            'color': '#000000',
-            'weight': 0.5,
-            'fillOpacity': 0.7
-        },
-        tooltip=folium.GeoJsonTooltip(
-            fields=fields_to_use,
-            aliases=aliases_to_use,
-            sticky=True,
-            style="font-family: Arial; font-size: 12px;"
-        )
-    ).add_to(mapa)
-    
-    # Adiciona marcadores com tratamento de campos ausentes
+    # criando grupo para cada tipo
+    grupos = {
+        "Federal": folium.FeatureGroup(
+            name=f'<span style="display:inline-block;'
+            f'width:12px;height:12px;background:{CORES_ASSENTAMENTOS["Federal"]};'
+            f'margin-right:6px;"></span>Federal',
+            overlay=True,
+        ),
+        "Estadual": folium.FeatureGroup(
+            name=f'<span style="display:inline-block;'
+            f'width:12px;height:12px;background:{CORES_ASSENTAMENTOS["Estadual"]};'
+            f'margin-right:6px;"></span>Estadual',
+            overlay=True,
+        ),
+    }
+
+    # Adiciona cada feature ao grupo correspondente
     for feature in features:
+        tipo = feature['properties'].get('tipo_assentamento', 'Outros').capitalize()
+        if tipo not in grupos:
+            continue  # Ignora tipos não mapeados
+
+        # Cria um GeoJSON individual para cada feature (simplificado)
+        single_feature_geojson = {
+            "type": "FeatureCollection",
+            "features": [feature]
+        }
+
+        # Adiciona ao GeoJson do grupo correspondente
+        folium.GeoJson(
+            single_feature_geojson,
+            style_function=lambda ft, tipo=tipo: {
+                'fillColor': CORES_ASSENTAMENTOS.get(tipo, "#ff7f0e"),
+                'color': '#000000',
+                'weight': 0.5,
+                'fillOpacity': 0.7
+            },
+            tooltip=folium.GeoJsonTooltip(
+                fields=campos_minimos,
+                aliases=[f"{campo}: " for campo in campos_minimos],
+                sticky=True,
+                style="font-family: Arial; font-size: 12px;"
+            )
+        ).add_to(grupos[tipo])
+
+        # Adiciona marcadores (lógica existente, mas direcionada ao mapa principal)
         try:
             props = feature['properties']
             
@@ -183,13 +174,19 @@ def adicionar_camadas(mapa: folium.Map, geojson_data: dict, tipo_filtrado: str =
                     icon='home',
                     prefix='fa'
                 )
-            ).add_to(mapa)
+            ).add_to(grupos[tipo])
         except (KeyError, IndexError, TypeError) as e:
             print(f"Erro ao processar feature: {e}")
+
+    # Adicionando todos os grupos ao mapa
+    for grupo in grupos.values():
+        grupo.add_to(mapa)
 
     # Adiciona minimapa
     MiniMap(toggle_display=True).add_to(mapa)
     Fullscreen().add_to(mapa)
+    folium.LayerControl(collapsed=False).add_to(mapa)
+
 
 def obter_municipios() -> list:
     """Obtém lista de municípios da API"""
@@ -276,19 +273,17 @@ def render_view_assentamento_map():
         
         # Exibe métricas
         st.metric("Total de assentamentos", stats["total_assentamentos"])
-        st.metric("Área total (ha)", stats["area_total"])
+        st.metric("Área total (ha)", str(stats["area_total"]).replace('.', ','))
         
         if municipio_selecionado == 'Todos' and tipo_selecionado == 'Todos':
-            st.metric("Área média (ha)", stats["area_media"])
-
-        st.markdown("---")
-        for tipo, cor in CORES_ASSENTAMENTOS.items():
-            st.markdown(f"<span style='color:{cor}; font-weight:bold'>■</span> {tipo}", unsafe_allow_html=True)
+            st.metric("Área média (ha)", str(stats["area_media"]).replace('.', ','))
 
     with col1:
         # Cria o mapa base
+        if "geo_muni" not in st.session_state:
+            st.session_state.geo_muni = carregar_municipios("todos")
         mapa = criar_mapa_base()
-            
+        adicionar_camada_municipios(mapa, st.session_state.geo_muni, False)
         if geojson_data:
             # Aplica os filtros no momento de exibição
             adicionar_camadas(
@@ -296,13 +291,14 @@ def render_view_assentamento_map():
                 geojson_data, 
                 tipo_filtrado=tipo_selecionado.lower() if tipo_selecionado != "Todos" else "todos"
             )
-            
+
             # Exibe o mapa
             st_folium(
                 mapa,
-                width=1200,
+                width=1000,
                 height=700,
-                returned_objects=[]
+                returned_objects=[],
+                use_container_width=True
             )
         else:
             st.warning("Nenhum dado disponível para os filtros selecionados.")
