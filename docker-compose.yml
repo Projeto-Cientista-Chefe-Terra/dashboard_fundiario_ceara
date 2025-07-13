@@ -48,7 +48,7 @@ services:
   dfundce:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dfundce
     container_name: dashboard_fundiario_ce
     depends_on:
       postgres:
