@@ -253,7 +253,7 @@ elif st.session_state.current_page == "Mapa Gini":
     mapa_gini(dados_fundiarios, contorno_municipios)
 
 elif st.session_state.current_page == "Mapa Hidrografico":
-    st.title("").markdown("### Mapa Hidrográfico!!! (em desenvolvimento)")
+    st.title("").markdown("### Mapa Hidrográfico")
     mapa_hidrográfico()
 elif st.session_state.current_page == "Mapa de Assentamento":
     st.title("").markdown("### Mapa de Assentamentos")
