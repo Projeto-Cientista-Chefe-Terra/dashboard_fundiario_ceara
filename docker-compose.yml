@@ -26,7 +26,8 @@ services:
   tgdmserver:
     build:
       context: ../terraGeoDataMiniServer
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.tgdmserver
+    image: terra_geodata_mini_server:latest
     container_name: terra_geodata_mini_server
     depends_on:
       postgres:
@@ -48,7 +49,8 @@ services:
   dfundce:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dfundce
+    image: dashboard_fundiario_ce:latest
     container_name: dashboard_fundiario_ce
     depends_on:
       postgres:
