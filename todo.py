@@ -6,3 +6,8 @@
 # TODO Inserir o "?" (Seção de "O que esse mapa é") Em todos as secoes com explicacoes sobre o que e apresentado
 # DONE Unificar os data_loaders e refatorar 
 # DONE Padronizar todas as tabelas para o estilo da tabela presente no Mapa de predominancia
+
+#TODO: URGENTE: Corrigir problema do Gini repetido em todos os municípios (Issue #12)
+#TODO: Corrigir problema de mostrar gráfico circular do Gini quando clicado
+#TODO: Corrigir problema dos tamanhos demasiado grandes dos objetos gráficos do sistema em monitores pequenos
+#TODO: Fazer a aplicação ser executado sobre HTTPS
