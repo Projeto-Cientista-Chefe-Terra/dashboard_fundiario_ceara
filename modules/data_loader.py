@@ -12,7 +12,7 @@ from typing import Dict, List, Any, Optional
 
 # Configuração ajustável da API
 DATA_SERVICE_URL = os.getenv("DATA_SERVICE_URL", "http://localhost:8000")
-REQUEST_TIMEOUT = 30  # segundos
+REQUEST_TIMEOUT = 120  # segundos
 
 @st.cache_data(ttl=86400)
 def _fetch_from_api(endpoint: str, params: Optional[Dict] = None) -> Any:
