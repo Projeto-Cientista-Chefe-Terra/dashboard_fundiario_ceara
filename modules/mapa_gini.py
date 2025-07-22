@@ -410,9 +410,16 @@ def render_map(tab, geo_df):
         m.get_root().html.add_child(folium.Element(legend_html))
         MiniMap(toggle_display=True).add_to(m)
         Fullscreen().add_to(m)
-        return st_folium(m, width=1200, height=900, returned_objects=["last_object_clicked"], use_container_width=True)
+        return st_folium(
+            m, 
+            width=1024, 
+            height=720, 
+            returned_objects=["last_object_clicked_tooltip"], 
+            use_container_width=True
+            )
 
 def render_view_gini_map(df_props, municipios):
+    
     # Detecção de outliers
     areas = df_props["area"]
     Q1, Q3 = areas.quantile([0.25, 0.75])
@@ -430,10 +437,10 @@ def render_view_gini_map(df_props, municipios):
 
     col1, col2 = st.columns([7, 3])
     with col2:
-        st.subheader("Índice de Gini Estadual")
+        st.subheader("Índice de Gini")
         st.markdown(gerar_grafico_circular(state_gini), unsafe_allow_html=True)
 
-        st.subheader("Gini por Município")
+        st.subheader("Gini por Região Administrativa")
         regioes = gini_with_filt["regiao_administrativa"].unique().tolist()
         regiao_selecionada = st.selectbox("Filtrar por Região:", options=["Todas"] + sorted(regioes), index=0)
         if regiao_selecionada != "Todas":
@@ -453,19 +460,60 @@ def render_view_gini_map(df_props, municipios):
         )
 
     map_data = render_map(col1, geo_with)
-    clicked = map_data.get("last_object_clicked") if map_data else None
-    if clicked and "properties" in clicked:
-        props = clicked["properties"]
-        nome = props.get("nome_municipio_original")
-        g_val = props.get("gini_area")
-        if nome and g_val is not None:
-            st.subheader(f"Distribuição Fundiária: {nome}")
-            st.markdown(gerar_grafico_circular(g_val, 150), unsafe_allow_html=True)
-            if st.button("Voltar para visão estadual"):
-                st.experimental_rerun()
+    
+    
+        
+    # Sofrimento e dor para descobrir este parâmetro "last_object_clicked_tooltip" (se usar o "last_object_clicked", ele retorna somente Lat e Lon)
+    # e mais sofrimento para descobrir que ele retorna 
+    # uma string grande que teria que ser "fatiada"
+    # Deixo aqui este registro para que outros não sofram tanto quanto eu sofri
+    # Se o mapa foi clicado e contém dados, processa o clique
+    # e as informações do tooltip são apssadas como string com apenas um "\n" entre elas
+    # no formato:
+    """
+    Aracoiaba
+    
+    Índice Gini: 
+    
+    0.7890
+    
+    Quantidade de imóveis: 
+    
+    1500
+    """
+    
+    
+    
+    clicked_data = map_data.get("last_object_clicked_tooltip") if map_data else None
+    
+    
+    # Limpa e extrai os dados da string recebida pelo método get("last_object_clicked_tooltip"), depois desenha o gráfico circular
+
+    if clicked_data:
+        ## Remove linhas vazias e espaços extras
+        lines = [line.strip() for line in clicked_data.split("\n") if line.strip()]
+
+        ## Extrai os valores
+        municipio = lines[1] if len(lines) > 1 else None
+        gini_mun_str = lines[3].replace(",", ".")
+        gini_mun = float(gini_mun_str) if gini_mun_str else None
+        
+        ## Exibe gráfico circular do Gini de um municipio específico   
+        with col2:
+            st.subheader("Índice de Gini")
+            st.markdown(f"<p style='text-align: center; color:black;'>{municipio}</p>", unsafe_allow_html=True)
+            if gini_mun is not None:
+                st.markdown(gerar_grafico_circular(state_gini), unsafe_allow_html=True)
+                st.button("Mostrar Gini Estadual Completo", key="mostrar_gini_estadual_completo")
+        
+    #debugging
+    # st.write("Municipio:", municipio)
+    # st.write("Gini:", gini_mun)
+    
+
 
     if st.sidebar.button("Mostrar Gini Estadual Completo"):
-        st.subheader("Distribuição Fundiária do Estado")
+        st.subheader("Distribuição Fundiária")
         st.markdown(gerar_grafico_circular(state_gini, 200), unsafe_allow_html=True)
 
         st.subheader("Distribuição de Áreas Fundiárias")
@@ -475,5 +523,7 @@ def render_view_gini_map(df_props, municipios):
         df_areas['faixa'] = pd.cut(df_areas['area'], bins=bins, labels=labels)
         area_dist = df_areas['faixa'].value_counts().sort_index()
         st.bar_chart(area_dist)
+
+
 
 
