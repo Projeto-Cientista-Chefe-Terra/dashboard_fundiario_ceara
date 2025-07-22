@@ -503,7 +503,7 @@ def render_view_gini_map(df_props, municipios):
             st.subheader("Índice de Gini")
             st.markdown(f"<p style='text-align: center; color:black;'>{municipio}</p>", unsafe_allow_html=True)
             if gini_mun is not None:
-                st.markdown(gerar_grafico_circular(state_gini), unsafe_allow_html=True)
+                st.markdown(gerar_grafico_circular(gini_mun), unsafe_allow_html=True)
                 st.button("Mostrar Gini Estadual Completo", key="mostrar_gini_estadual_completo")
         
     #debugging
@@ -514,7 +514,7 @@ def render_view_gini_map(df_props, municipios):
 
     if st.sidebar.button("Mostrar Gini Estadual Completo"):
         st.subheader("Distribuição Fundiária")
-        st.markdown(gerar_grafico_circular(state_gini, 200), unsafe_allow_html=True)
+        st.markdown(gerar_grafico_circular(gini_mun, 200), unsafe_allow_html=True)
 
         st.subheader("Distribuição de Áreas Fundiárias")
         bins = [0, 10, 50, 100, 500, 1000, float('inf')]
