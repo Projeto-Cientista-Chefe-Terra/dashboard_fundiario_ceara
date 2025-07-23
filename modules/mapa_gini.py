@@ -418,7 +418,7 @@ def render_map(tab, geo_df):
             use_container_width=True
             )
 
-def render_view_gini_map(df_props, municipios):
+def render_view_gini_map(df_props, municipios, clicou=False):
     
     # Detecção de outliers
     areas = df_props["area"]
@@ -436,33 +436,9 @@ def render_view_gini_map(df_props, municipios):
     geo_with = municipios.merge(gini_with, on="nome_municipio", how="left")
 
     col1, col2 = st.columns([7, 3])
-    with col2:
-        st.subheader("Índice de Gini")
-        st.markdown(gerar_grafico_circular(state_gini), unsafe_allow_html=True)
-
-        st.subheader("Gini por Região Administrativa")
-        regioes = gini_with_filt["regiao_administrativa"].unique().tolist()
-        regiao_selecionada = st.selectbox("Filtrar por Região:", options=["Todas"] + sorted(regioes), index=0)
-        if regiao_selecionada != "Todas":
-            df_tabela = gini_with_filt[gini_with_filt["regiao_administrativa"] == regiao_selecionada]
-        else:
-            df_tabela = gini_with_filt
-        st.dataframe(
-            df_tabela[["regiao_administrativa", "nome_municipio_original", "cnt", "gini_area"]]
-            .rename(columns={
-                "regiao_administrativa": "Região",
-                "nome_municipio_original": "Município",
-                "gini_area": "Gini",
-                "cnt": "Qtd. Lotes",
-            })
-            .sort_values("Gini", ascending=False),
-            use_container_width=True, hide_index=True, height=600
-        )
-
     map_data = render_map(col1, geo_with)
+    clicou = False
     
-    
-        
     # Sofrimento e dor para descobrir este parâmetro "last_object_clicked_tooltip" (se usar o "last_object_clicked", ele retorna somente Lat e Lon)
     # e mais sofrimento para descobrir que ele retorna 
     # uma string grande que teria que ser "fatiada"
@@ -483,46 +459,65 @@ def render_view_gini_map(df_props, municipios):
     """
     
     
-    
     clicked_data = map_data.get("last_object_clicked_tooltip") if map_data else None
-    
-    
     # Limpa e extrai os dados da string recebida pelo método get("last_object_clicked_tooltip"), depois desenha o gráfico circular
-
-    if clicked_data:
-        ## Remove linhas vazias e espaços extras
-        lines = [line.strip() for line in clicked_data.split("\n") if line.strip()]
-
-        ## Extrai os valores
-        municipio = lines[1] if len(lines) > 1 else None
-        gini_mun_str = lines[3].replace(",", ".")
-        gini_mun = float(gini_mun_str) if gini_mun_str else None
+    if 'gini_estadual_clicado' not in st.session_state:
+        st.session_state.gini_estadual_clicado = clicou
         
+    
+    if st.session_state.gini_estadual_clicado:
+        st.write("ds")
+    with col2:
+        st.subheader("Índice de Gini")
         ## Exibe gráfico circular do Gini de um municipio específico   
-        with col2:
-            st.subheader("Índice de Gini")
+        if clicked_data and not st.session_state.gini_estadual_clicado:
+            ## Remove linhas vazias e espaços extras
+            lines = [line.strip() for line in clicked_data.split("\n") if line.strip()]
+
+            ## Extrai os valores
+            municipio = lines[1] if len(lines) > 1 else None
+            gini_mun_str = lines[3].replace(",", ".")
+            gini_mun = float(gini_mun_str) if gini_mun_str else None
             st.markdown(f"<p style='text-align: center; color:black;'>{municipio}</p>", unsafe_allow_html=True)
             if gini_mun is not None:
-                st.markdown(gerar_grafico_circular(gini_mun), unsafe_allow_html=True)
-                st.button("Mostrar Gini Estadual Completo", key="mostrar_gini_estadual_completo")
-        
-    #debugging
-    # st.write("Municipio:", municipio)
-    # st.write("Gini:", gini_mun)
-    
+                st.markdown(gerar_grafico_circular(gini_mun, 150), unsafe_allow_html=True)
+                if st.button("Mostrar Gini Estadual Completo", key="mostrar_gini_estadual_completo", use_container_width=True):
+                    st.session_state.gini_estadual_clicado = True
+                    st.rerun()
+        else:
+            st.markdown(gerar_grafico_circular(state_gini, 150), unsafe_allow_html=True)
+            st.session_state.gini_estadual_clicado = False
 
+        st.subheader("Gini por Região Administrativa")
+        regioes = gini_with_filt["regiao_administrativa"].unique().tolist()
+        regiao_selecionada = st.selectbox("Filtrar por Região:", options=["Todas"] + sorted(regioes), index=0)
+        if regiao_selecionada != "Todas":
+            df_tabela = gini_with_filt[gini_with_filt["regiao_administrativa"] == regiao_selecionada]
+        else:
+            df_tabela = gini_with_filt
+        st.dataframe(
+            df_tabela[["regiao_administrativa", "nome_municipio_original", "cnt", "gini_area"]]
+            .rename(columns={
+                "regiao_administrativa": "Região",
+                "nome_municipio_original": "Município",
+                "gini_area": "Gini",
+                "cnt": "Qtd. Lotes",
+            })
+            .sort_values("Gini", ascending=False),
+            use_container_width=True, hide_index=True, height=600
+        )    
+    return clicou
+    # if st.sidebar.button("Mostrar Gini Estadual Completo"):
+    #     st.subheader("Distribuição Fundiária")
+    #     st.markdown(gerar_grafico_circular(gini_mun, 200), unsafe_allow_html=True)
 
-    if st.sidebar.button("Mostrar Gini Estadual Completo"):
-        st.subheader("Distribuição Fundiária")
-        st.markdown(gerar_grafico_circular(gini_mun, 200), unsafe_allow_html=True)
-
-        st.subheader("Distribuição de Áreas Fundiárias")
-        bins = [0, 10, 50, 100, 500, 1000, float('inf')]
-        labels = ['<10 ha', '10-50 ha', '50-100 ha', '100-500 ha', '500-1000 ha', '>1000 ha']
-        df_areas = df_with.copy()
-        df_areas['faixa'] = pd.cut(df_areas['area'], bins=bins, labels=labels)
-        area_dist = df_areas['faixa'].value_counts().sort_index()
-        st.bar_chart(area_dist)
+    #     st.subheader("Distribuição de Áreas Fundiárias")
+    #     bins = [0, 10, 50, 100, 500, 1000, float('inf')]
+    #     labels = ['<10 ha', '10-50 ha', '50-100 ha', '100-500 ha', '500-1000 ha', '>1000 ha']
+    #     df_areas = df_with.copy()
+    #     df_areas['faixa'] = pd.cut(df_areas['area'], bins=bins, labels=labels)
+    #     area_dist = df_areas['faixa'].value_counts().sort_index()
+    #     st.bar_chart(area_dist)
 
 
 
