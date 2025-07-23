@@ -155,12 +155,11 @@ def compute_stats_df(df: pd.DataFrame) -> pd.DataFrame:
 def render_view_grafico_interativo(df_class):
     col1, col2 = st.columns([6, 4])
     tab1, tab2 = col1.tabs(["Gráfico de Pizza","Gráfico de Barras"])
-    col2.subheader("").markdown("##### Filtrar por:")
+    # col2.subheader("").markdown("##### Filtrar por:")
     co2_1, co2_2 = col2.columns([1, 1])
     opcao = co2_1.selectbox(
         "Filtrar por:", 
         ["Todo o Estado", "Municípios", "Regiões Administrativas"],
-        label_visibility="hidden"
     )
     entidade = ""
     if opcao != "Todo o Estado":

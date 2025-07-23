@@ -251,7 +251,7 @@ def render_view_predominancia_map(dados_fundiarios,contorno_municipios):
         #Adicionando minimap
         MiniMap(toggle_display=True).add_to(mapa_obj)
         Fullscreen().add_to(mapa_obj)
-        st_folium(mapa_obj, width=1000, height=600, returned_objects=[], use_container_width=True)
+        st_folium(mapa_obj, width=1000, height=700, returned_objects=[], use_container_width=True)
 
     show_debug_info = False #st.checkbox("Mostrar informações de debug")
    
