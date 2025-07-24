@@ -178,13 +178,13 @@ def validate_data(df: pd.DataFrame) -> tuple:
         return df, df, None, df, {}
 
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=7200)
 def fetch_regioes() -> list[str]:
     resp = requests.get(f"{DATA_SERVICE_URL}/regioes", timeout=20)
     resp.raise_for_status()
     return resp.json().get("regioes", [])
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=7200)
 def fetch_municipios(regiao: str) -> list[str]:
     resp = requests.get(f"{DATA_SERVICE_URL}/municipios", params={"regiao": regiao}, timeout=20)
     if resp.status_code == 404:
@@ -192,19 +192,19 @@ def fetch_municipios(regiao: str) -> list[str]:
     resp.raise_for_status()
     return resp.json().get("municipios", [])
 
-@st.cache_data(ttl=600)
+@st.cache_data(ttl=1200)
 def fetch_geojson_por_regiao(regiao: str) -> dict:
     resp = requests.get(f"{DATA_SERVICE_URL}/geojson", params={"regiao": regiao}, timeout=20)
     resp.raise_for_status()
     return resp.json()
 
-@st.cache_data(ttl=600)
+@st.cache_data(ttl=1200)
 def fetch_geojson_por_municipio(municipio: str) -> dict:
     resp = requests.get(f"{DATA_SERVICE_URL}/geojson", params={"municipio": municipio}, timeout=20)
     resp.raise_for_status()
     return resp.json()
 
-@st.cache_data(ttl=3600)
+@st.cache_data(ttl=7200)
 def fetch_geojson_limites(municipio: str) -> dict:
     """
     Chama GET /geojson_muni?municipio=YYY e retorna o FeatureCollection do município (limite administrativo).
