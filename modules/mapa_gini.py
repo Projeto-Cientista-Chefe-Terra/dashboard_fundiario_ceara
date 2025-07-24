@@ -463,10 +463,7 @@ def render_view_gini_map(df_props, municipios, clicou=False):
     # Limpa e extrai os dados da string recebida pelo método get("last_object_clicked_tooltip"), depois desenha o gráfico circular
     if 'gini_estadual_clicado' not in st.session_state:
         st.session_state.gini_estadual_clicado = clicou
-        
-    
-    if st.session_state.gini_estadual_clicado:
-        st.write("ds")
+
     with col2:
         st.subheader("Índice de Gini")
         ## Exibe gráfico circular do Gini de um municipio específico   
