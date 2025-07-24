@@ -213,6 +213,9 @@ footer,
   padding-top: 50px;
 }
 
+.stSidebar .stVerticalBlock {
+  margin-top: 40px;
+}
 
 
 /* ============ MEDIA QUERIES ============ */
