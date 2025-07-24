@@ -3,15 +3,14 @@
     As cores e fontes foram escolhidas para criar um tema escuro e moderno.
   */
 
-/* 1. Importa Roboto do Google Fonts */
-/* @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap'); */
+/* 1. Importa Jakarta Sans do Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&display=swap");
 
 html,
 body,
 [class*="css"] {
   font-family: "Plus Jakarta Sans" !important;
-  font-size: 18px;
+  /* font-size: 18px; */
   font-weight: 500;
   color: #091747;
 }
@@ -35,7 +34,7 @@ body {
 }
 
 .stSidebar button p {
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 600;
 }
 
@@ -61,6 +60,8 @@ h5,
 h6 {
   font-family: "Plus Jakarta Sans" !important;
   color: #b06e2e;
+  padding-bottom: 8px !important;
+  padding-top: 0px !important;
 }
 
 .stHeading h1 {
@@ -76,6 +77,11 @@ h6 {
   padding: 0.5rem;
   color: #000000;
   font-family: "Plus Jakarta Sans" !important;
+}
+
+.stSelectbox > label > div > p {
+    font-weight: 600;
+    font-family: "Plus Jakarta Sans" !important;
 }
 
 /* 9. Inputs, selects e áreas de texto */
@@ -119,6 +125,7 @@ h6 {
 
 #op-ent {
   font-size: 1.15rem;
+  margin-bottom: 0px;
 }
 
 /* Efeito quando clicado (opcional) */
@@ -156,6 +163,14 @@ footer,
   padding-top: 5dvh;
 }
 
+.stRadio > label > div > p {
+  font-family: "Plus Jakarta Sans" !important;
+  color: #b06e2e;
+  font-weight: 700;
+  font-size: 20px;
+} 
+
+
 .custom-header {
   position: fixed;
   display: flex;
@@ -192,9 +207,145 @@ footer,
   color: #0c0906;
 }
 
-
 .stSidebar img {
   width: 100px;
   height: 180px;
   padding-top: 50px;
+}
+
+
+
+/* ============ MEDIA QUERIES ============ */
+
+/* Tablet (768px a 1024px) */
+@media screen and (max-width: 1024px) {
+  html,
+  body,
+  [class*="css"] {
+    font-size: 16px !important;
+  }
+
+  .stMain > div {
+    padding-top: 3dvh !important;
+  }
+
+  .grafico {
+    --tamanho: 180px;
+  }
+
+  .stTabs p {
+    font-size: 1.1rem !important;
+  }
+
+  .stSidebar button p {
+    font-size: 0.9rem !important;
+  }
+
+  .stSelectbox p {
+    font-size: 1.1rem !important;
+  }
+
+  #op-ent {
+    font-size: 1rem !important;
+  }
+}
+
+/* Smartphone (480px a 767px) */
+@media screen and (max-width: 767px) {
+  html,
+  body,
+  [class*="css"] {
+    font-size: 14px !important;
+  }
+
+  h2 {
+    font-size: 1.5rem !important;
+  }
+
+  .stMain > div {
+    padding-top: 2dvh !important;
+  }
+
+  .grafico {
+    --tamanho: 150px;
+  }
+
+  .grafico::before {
+    font-size: 24px !important;
+  }
+
+  .stTabs [tabindex="0"] {
+    padding: 4px !important;
+  }
+
+  .stTabs p {
+    font-size: 1rem !important;
+  }
+
+  .stButton > button {
+    padding: 8px 12px !important;
+  }
+
+  .stSidebar {
+    width: 180px !important;
+  }
+
+  .stSidebar img {
+    width: 80px !important;
+    height: auto !important;
+    padding-top: 20px !important;
+  }
+
+  .stDataFrameWrapper,
+  .stTable {
+    padding: 0.2rem !important;
+  }
+}
+
+/* Smartphone pequeno (até 479px) */
+@media screen and (max-width: 479px) {
+  html,
+  body,
+  [class*="css"] {
+    font-size: 13px !important;
+  }
+
+  .grafico {
+    --tamanho: 120px;
+  }
+
+  .stSidebar {
+    width: 150px !important;
+  }
+
+  .stSidebar button p {
+    font-size: 0.8rem !important;
+  }
+
+  .custom-header h1 {
+    font-size: 1.5rem !important;
+  }
+
+  .stTextInput > div > div > input,
+  .stSelectbox > div > div > div > div {
+    font-size: 0.8rem !important;
+  }
+}
+
+/* ============ AJUSTES ESPECÍFICOS PARA LAYOUT ============ */
+
+/* Garante que a sidebar não fique muito estreita */
+@media screen and (max-width: 767px) {
+  .stSidebar .stButton > button {
+    justify-content: center !important;
+    padding: 6px 8px !important;
+  }
+}
+
+/* Ajusta o padding dos containers principais */
+@media screen and (max-width: 1024px) {
+  .stApp > .main > div {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
 }

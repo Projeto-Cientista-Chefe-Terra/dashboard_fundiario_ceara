@@ -168,19 +168,20 @@ def sobre():
     st.markdown("https://github.com/Projeto-Cientista-Chefe-Terra")
 
     st.header("Apoio")
+    st.image("./assets/Logos.png", use_container_width=True)
     col1, col2, col3, col4 = st.columns(4, vertical_alignment='center', )
 
-    with col1:
-        st.image("./assets/Idace.png", width=150)
+    # with col1:
+    #     st.image("./assets/Idace.png", width=150)
         
-    with col2:
-        st.image("./assets/CC_Terra.png", width=150)
+    # with col2:
+    #     st.image("./assets/CC_Terra.png", width=150)
 
-    with col3:
-        st.image("./assets/funcap.png", width=250)
+    # with col3:
+    #     st.image("./assets/funcap.png", width=250)
         
-    with col4:
-        st.image("./assets/ufc_logo.png", width=150)
+    # with col4:
+    #     st.image("./assets/ufc_logo.png", width=150)
 
 
 
@@ -241,22 +242,40 @@ if st.session_state.current_page == "Gráficos":
     graficos_e_quadros()
 
 elif st.session_state.current_page == "Mapa de Predominância":
-    st.title("").markdown("### Mapa de Predominância do Tipo de  Imóvel por Município")
+    st.title("").markdown("### Mapa de Predominância do Tipo de  Imóvel por Município",
+                        unsafe_allow_html=True, help=
+                        """**O que esse mapa é:**  
+                            
+                            """)
     mapa_de_Predominância(dados_fundiarios, contorno_municipios)
 
 elif st.session_state.current_page == "Mapa Interativo":
-    st.title("").markdown("### Mapa Interativo")
+    st.title("").markdown("### Mapa Interativo",
+                        unsafe_allow_html=True, help=
+                        """**O que esse mapa é:**  
+                            
+                            """)
     mapa_interativo()
 
 elif st.session_state.current_page == "Mapa Gini":
-    st.title("").markdown("### Mapa Gini do Ceará")
+    st.title("").markdown("### Mapa Gini do Ceará",
+                        unsafe_allow_html=True, help=
+                        """**O que esse mapa é:**  
+                           
+                           """)
     mapa_gini(dados_fundiarios, contorno_municipios)
 
 elif st.session_state.current_page == "Mapa Hidrografico":
-    st.title("").markdown("### Mapa Hidrográfico")
+    st.title("").markdown("### Mapa Hidrográfico",
+                        unsafe_allow_html=True, help=
+                        """**O que esse mapa é:**  
+                           """)
     mapa_hidrográfico()
 elif st.session_state.current_page == "Mapa de Assentamento":
-    st.title("").markdown("### Mapa de Assentamentos")
+    st.title("").markdown("### Mapa de Assentamentos",
+                        unsafe_allow_html=True, help=
+                        """**O que esse mapa é:**  
+                          """)
     mapa_Assentamentos()
 
 elif st.session_state.current_page == "Sobre":

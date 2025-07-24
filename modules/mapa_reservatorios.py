@@ -337,5 +337,5 @@ def render_view_reservatorios_map():
         folium.LayerControl(collapsed=False).add_to(mapa)
         MiniMap(toggle_display=True).add_to(mapa)
         Fullscreen().add_to(mapa)
-        st_folium(mapa, width=1000, height=800, returned_objects=[], use_container_width=True)
+        st_folium(mapa, width=1000, height=700, returned_objects=[], use_container_width=True)
 
