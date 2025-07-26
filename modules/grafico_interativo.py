@@ -118,6 +118,8 @@ def plot_pizza(resultados, titulo, subtitulo) -> plt.Figure:
         startangle=90,
         colors=colors,
         pctdistance=0.8,
+        textprops={'fontsize': 16},
+        
     )
     ax.set_title(f"{titulo}\n{subtitulo}", fontsize=16)
     ax.axis("equal")
