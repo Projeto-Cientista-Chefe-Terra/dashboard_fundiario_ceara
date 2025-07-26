@@ -168,7 +168,7 @@ def _adicionar_legenda(mapa: folium.Map, cores: dict):
     legenda = """
     {% macro html(this, kwargs) %}
     <div id='legend' style="
-       position: fixed; bottom: 50px; left: 50px;
+       position: fixed; top: 50px; right: 50px;
        width: 220px; background: white; padding: 10px;
        border:2px solid grey; z-index:9999;
        font-size:12px; line-height:1.2em;">

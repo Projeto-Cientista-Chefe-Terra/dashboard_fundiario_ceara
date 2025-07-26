@@ -125,7 +125,7 @@ def plot_pizza(resultados, titulo, subtitulo) -> plt.Figure:
         wedges,
         resultados.keys(),
         title="Tipos de Propriedade",
-        loc="center left",
+        loc="upper right", # center left
         bbox_to_anchor=(1, 0, 0.5, 1),
     )
     plt.tight_layout()
