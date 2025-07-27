@@ -136,7 +136,7 @@ def sobre():
     st.subheader("Coordenadora Geral")
     st.markdown(
         """    
-    Profa. Maria Inês Escobar da Costa (EcoEco-UFC)
+    Profa. Maria Inês Escobar da Costa (UFC)
     """
     )
 
