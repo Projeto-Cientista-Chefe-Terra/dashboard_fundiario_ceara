@@ -110,7 +110,6 @@ def plot_pizza(resultados, titulo, subtitulo) -> plt.Figure:
     # Get colors in correct order
     colors = [color_map[cat] for cat in resultados.keys()]
 
-    # plt.figure(figsize=(10, 10))
     wedges, texts, autotexts = ax.pie(
         list(resultados.values()),
         labels=None,
@@ -119,7 +118,6 @@ def plot_pizza(resultados, titulo, subtitulo) -> plt.Figure:
         colors=colors,
         pctdistance=0.8,
         textprops={'fontsize': 16},
-        
     )
     ax.set_title(f"{titulo}\n{subtitulo}", fontsize=16)
     ax.axis("equal")
@@ -130,7 +128,43 @@ def plot_pizza(resultados, titulo, subtitulo) -> plt.Figure:
         loc="upper right", # center left
         bbox_to_anchor=(1, 0, 0.5, 1),
     )
-    plt.tight_layout()
+    
+    # Proposta de forma de visualização de porcentagens em gráfico pizza
+    # wedges, texts = ax.pie(
+    #     list(resultados.values()),
+    #     labels=None,
+    #     startangle=90,
+    #     colors=colors,
+    # )
+    # ax.set_title(f"{titulo}\n{subtitulo}", fontsize=16)
+    # ax.axis("equal")
+    # ax.legend(
+    #     wedges,
+    #     resultados.keys(),
+    #     title="Tipos de Propriedade",
+    #     loc="upper right", # center left
+    #     bbox_to_anchor=(1, 0, 0.5, 1),
+    # )
+    # total = sum(resultados.values())
+    # percentuais = {categoria: (valor / total) * 100 for categoria, valor in resultados.items()}
+    # labels_legenda = [
+    #     f"{categoria} ({percentuais[categoria]:.1f}%)" 
+    #     for categoria in resultados.keys()
+    # ]
+    
+    # legenda = ax.legend(
+    #     wedges,
+    #     labels_legenda,
+    #     title="Tipos de Propriedade",
+    #     loc="upper right", # center left
+    #     bbox_to_anchor=(1, 0, 0.5, 1),
+    #     title_fontsize='15',
+    #     fontsize=14,
+    # )
+    
+    # plt.subplots_adjust(right=0.7) 
+    
+    
     return fig
 
 @st.cache_data
