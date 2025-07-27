@@ -159,7 +159,6 @@ def criar_mapa_contextual(
 
     # Adiciona legenda e controles
     _adicionar_legenda(mapa, cores)
-    folium.LayerControl().add_to(mapa)
     
     return mapa
 
@@ -168,7 +167,7 @@ def _adicionar_legenda(mapa: folium.Map, cores: dict):
     legenda = """
     {% macro html(this, kwargs) %}
     <div id='legend' style="
-       position: fixed; top: 50px; right: 50px;
+       position: fixed; top: 10px; right: 10px;
        width: 220px; background: white; padding: 10px;
        border:2px solid grey; z-index:9999;
        font-size:12px; line-height:1.2em;">
