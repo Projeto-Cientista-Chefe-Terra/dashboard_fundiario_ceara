@@ -121,7 +121,7 @@ def adicionar_camada_reservatorios(mapa: folium.Map, geojson_data: dict):
     nome_fg = (
         f'<span style="display:inline-block;'
         f'width:12px;height:12px;background:{COR_RESERVATORIO};'
-        f'margin-right:6px;"></span>Reservatórios'
+        f'margin-right:6px;"></span>Reservatórios Monitorados'
     )
     fg = folium.FeatureGroup(name=nome_fg, overlay=True)
 

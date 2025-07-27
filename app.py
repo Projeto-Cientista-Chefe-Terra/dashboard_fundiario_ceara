@@ -212,11 +212,11 @@ with st.sidebar:
         "Mapa de Predominância", use_container_width=True, icon=":material/location_on:"
     ):
         st.session_state.current_page = "Mapa de Predominância"
-    if st.button("Mapa Interativo", use_container_width=True, icon=":material/map:"):
-        st.session_state.current_page = "Mapa Interativo"
+    if st.button("Mapa da Malha Fundiária", use_container_width=True, icon=":material/map:"):
+        st.session_state.current_page = "Mapa da Malha Fundiária"
 
-    if st.button("Mapa Gini", use_container_width=True, icon=":material/crisis_alert:"):
-        st.session_state.current_page = "Mapa Gini"
+    if st.button("Mapa de Concentração Fundiária", use_container_width=True, icon=":material/crisis_alert:"):
+        st.session_state.current_page = "Mapa de Concentração Fundiária"
 
     if st.button("Mapa de Assentamentos", use_container_width=True, icon=":material/globe_location_pin:"):
         st.session_state.current_page = "Mapa de Assentamento"
@@ -249,16 +249,16 @@ elif st.session_state.current_page == "Mapa de Predominância":
                             """)
     mapa_de_Predominância(dados_fundiarios, contorno_municipios)
 
-elif st.session_state.current_page == "Mapa Interativo":
-    st.title("").markdown("### Mapa Interativo",
+elif st.session_state.current_page == "Mapa da Malha Fundiária":
+    st.title("").markdown("### Mapa da Malha Fundiária",
                         unsafe_allow_html=True, help=
                         """**O que esse mapa é:**  
                             
                             """)
     mapa_interativo()
 
-elif st.session_state.current_page == "Mapa Gini":
-    st.title("").markdown("### Mapa Gini do Ceará",
+elif st.session_state.current_page == "Mapa de Concentração Fundiária":
+    st.title("").markdown("### Mapa de Concentração Fundiária do Ceará",
                         unsafe_allow_html=True, help=
                         """**O que esse mapa é:**  
                            
