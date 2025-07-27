@@ -190,9 +190,6 @@ def render_view_grafico_interativo(df_class):
                   """)
         col2.dataframe(df_tab, use_container_width=True, hide_index=True,)
 
-        col2.subheader("").markdown("#### Estatísticas Gerais")
-        col2.dataframe(compute_stats_df(df_class), use_container_width=True, hide_index=True,)
-
 
     if resultados:
         st.html("<h5>Dados atualizadoe em 24/02/2025</h5>")
