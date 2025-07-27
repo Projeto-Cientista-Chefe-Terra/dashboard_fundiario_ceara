@@ -110,7 +110,7 @@ def criar_mapa_contextual(
             name="Limite dos Municípios"
         ).add_to(mapa)
 
-    if modo_mapa == "Heatmap" and categoria_heatmap in gdf.columns:
+    if modo_mapa == "Mapa de Calor" and categoria_heatmap in gdf.columns:
         # Configuração do Heatmap
         heat_data = [
             [row.geometry.centroid.y, row.geometry.centroid.x, row[categoria_heatmap]]
@@ -126,7 +126,7 @@ def criar_mapa_contextual(
                 radius=35,
                 blur=18,
                 gradient={0.0: "#ffffff", 1.0: cores.get(categoria_heatmap, "#fd8d3c")},
-                name=f"Heatmap: {categoria_heatmap}"
+                name=f"Mapa de Calor: {categoria_heatmap}"
             ).add_to(mapa)
     else:
         # Mapa Coroplético
@@ -207,13 +207,13 @@ def render_view_predominancia_map(dados_fundiarios,contorno_municipios):
         # Controles do mapa
         modo_mapa = st.radio(
             "Tipo de Mapa:",
-            options=["Categorias Dominantes", "Heatmap"],
+            options=["Mapa de Calor", "Tipo de Propriedade Predominante no Município"],
             index=0
         )
         
         categoria_heatmap = None
-        if modo_mapa == "Heatmap":
-            categoria_heatmap = st.selectbox("Categoria para Heatmap:", categorias)
+        if modo_mapa == "Mapa de Calor":
+            categoria_heatmap = st.selectbox("Categoria para Mapa de Calor:", categorias)
 
         # Seleção do município com dados completos
         st.markdown("#### Classificação do Município")
