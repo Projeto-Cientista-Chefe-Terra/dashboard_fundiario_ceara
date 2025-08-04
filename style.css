@@ -218,6 +218,28 @@ footer,
 }
 
 
+
+.stExpander {
+  color: #000000;
+}
+
+.stExpander summary p {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.stExpander summary:hover {
+  color: #000000;
+}
+
+.stExpander .stVerticalBlock p {
+    color: #555555;
+}
+.stExpander .stVerticalBlock ul {
+    color: #555555;
+}
+
+
 /* ============ MEDIA QUERIES ============ */
 
 /* Tablet (768px a 1024px) */
