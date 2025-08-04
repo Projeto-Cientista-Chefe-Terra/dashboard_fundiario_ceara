@@ -203,6 +203,13 @@ def render_view_grafico_interativo(df_class):
                   <p id="op-ent"><b>[{opcao}]</b>{entidade} </p>
                   """)
         col2.dataframe(df_tab, use_container_width=True, hide_index=True,)
+        if opcao != "Todo o Estado":
+            df_filtrado = filtrar_dados(df_class, "Todo o Estado")
+            res, tot = classificar_propriedades(df_filtrado)
+            col2.pyplot(plot_pizza(
+            res, f"Propriedades - Todo o Estado", f"Total: {tot}"
+        ))
+        
 
 
     if resultados:
