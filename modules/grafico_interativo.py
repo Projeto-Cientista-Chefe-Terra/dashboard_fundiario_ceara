@@ -168,6 +168,83 @@ def compute_stats_df(df: pd.DataFrame) -> pd.DataFrame:
         .rename(columns={"index": "Estatística"})
     )
 
+@st.cache_data
+def plot_area_pizza(df: pd.DataFrame, titulo: str) -> plt.Figure:
+    """
+    Plota gráfico de pizza mostrando a distribuição percentual das áreas por categoria
+    """
+    # Classifica as propriedades
+    mf = df["modulo_fiscal"]
+    area = df["area"]
+    categorias = np.where(
+        area < mf,
+        "Pequena Propriedade < 1 MF",
+        np.where(
+            area <= 4 * mf,
+            "Pequena Propriedade",
+            np.where(area <= 15 * mf, "Média Propriedade", "Grande Propriedade"),
+        ),
+    )
+    
+    # Calcula a área total por categoria
+    df_categorizado = df.copy()
+    df_categorizado['categoria'] = categorias
+    area_por_categoria = df_categorizado.groupby('categoria')['area'].sum()
+    area_total = df['area'].sum()
+    
+    # Mapeamento de cores
+    color_map = {
+        "Pequena Propriedade < 1 MF": CORES["Pequena Propriedade < 1 MF"],
+        "Pequena Propriedade": CORES["Pequena Propriedade"],
+        "Média Propriedade": CORES["Média Propriedade"],
+        "Grande Propriedade": CORES["Grande Propriedade"],
+    }
+    
+    fig, ax = plt.subplots(figsize=(8, 8))
+    
+    # Ordena as categorias para consistência
+    categorias_ordenadas = sorted(area_por_categoria.index)
+    areas_ordenadas = [area_por_categoria[cat] for cat in categorias_ordenadas]
+    colors = [color_map[cat] for cat in categorias_ordenadas]
+    
+    # Plot do gráfico de pizza
+    wedges, texts, autotexts = ax.pie(
+        areas_ordenadas,
+        labels=None,
+        colors=colors,
+        startangle=90,
+        autopct='%1.1f%%',
+        pctdistance=0.85,
+        textprops={'fontsize': 12}
+    )
+    
+    # Ajusta o estilo dos percentuais
+    for autotext in autotexts:
+        autotext.set_color('black')
+        autotext.set_fontweight('bold')
+    
+    # ax.set_title(f"Distribuição de Áreas por Propriedade\n{titulo}", fontsize=16, pad=20)
+    
+    # Adiciona legenda
+    percentuais = {cat: (area/area_total)*100 for cat, area in zip(categorias_ordenadas, areas_ordenadas)}
+    labels_legenda = [
+        f"{cat} ({percentuais[cat]:.1f}%)" 
+        for cat in categorias_ordenadas
+    ]
+    
+    ax.legend(
+        wedges,
+        labels_legenda,
+        title="Propriedade",
+        loc="upper center",
+        bbox_to_anchor=(1, 0, 0.5, 1),
+        fontsize=12,
+        title_fontsize=13
+    )
+    
+    plt.tight_layout()
+    return fig
+
 def render_view_grafico_interativo(df_class):
     col1, col2 = st.columns([6, 4])
     tab1, tab2 = col1.tabs(["Gráfico de Pizza","Gráfico de Barras"])
@@ -193,6 +270,11 @@ def render_view_grafico_interativo(df_class):
             resultados, f"Propriedades - {opcao} - {entidade}", f"Total: {total}"
         )
 
+        # Novo gráfico de pizza de distribuição de áreas
+        fig_area_pizza = plot_area_pizza(
+            df_filtrado, 
+            f"{opcao} - {entidade}" if opcao != "Todo o Estado" else "Todo o Estado"
+        )
 
         tab1.pyplot(fig_pizza)
         tab2.pyplot(fig_barra)
@@ -203,17 +285,12 @@ def render_view_grafico_interativo(df_class):
                   <p id="op-ent"><b>[{opcao}]</b>{entidade} </p>
                   """)
         col2.dataframe(df_tab, use_container_width=True, hide_index=True,)
-        if opcao != "Todo o Estado":
-            df_filtrado = filtrar_dados(df_class, "Todo o Estado")
-            res, tot = classificar_propriedades(df_filtrado)
-            col2.pyplot(plot_pizza(
-            res, f"Propriedades - Todo o Estado", f"Total: {tot}"
-        ))
         
-
+        # col2.subheader("").markdown("#### Distribuição de Áreas por Propriedade")
+        # col2.pyplot(fig_area_pizza)
 
     if resultados:
-        st.html("<h5>Dados atualizadoe em 24/02/2025</h5>")
+        st.html("<h5>Dados atualizados em 24/02/2025</h5>")
         df_tab = pd.DataFrame(
             list(resultados.items()), columns=["Categoria", "Quantidade"]
         )
@@ -221,7 +298,5 @@ def render_view_grafico_interativo(df_class):
 
         # Tabs
         preencher_tabs()
-
     else:
         st.warning("Nenhum dado disponível para o filtro selecionado.")
-
