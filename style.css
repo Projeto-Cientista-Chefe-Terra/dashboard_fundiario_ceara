@@ -241,8 +241,9 @@ footer,
 }
 
 .stExpander summary p {
+  font-family: 'Kanit' !important;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .stExpander summary:hover {
