@@ -12,7 +12,7 @@ enableWebsocketCompression = false
 
 [theme]
 base                     = "light"
-primaryColor             = "#B06E2E"
+primaryColor             = "#00a84a"
 backgroundColor          = "#FFFFFF"
 secondaryBackgroundColor = "#FAF5F0"
 textColor                = "#000000"
