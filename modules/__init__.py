@@ -10,7 +10,6 @@ from .grafico_interativo import (
     classificar_propriedades,
     plot_barras,
     plot_pizza,
-    compute_stats_df,
     render_view_grafico_interativo
 )
 from .mapa_predominancia import (
@@ -53,7 +52,7 @@ __all__ = [
     "classificar_propriedades", 
     "plot_barras", 
     "plot_pizza", 
-    "compute_stats_df",
+    
     
     # Contextual map functions
     "preparar_dados", 

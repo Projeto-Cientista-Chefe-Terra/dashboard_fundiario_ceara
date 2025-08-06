@@ -147,26 +147,26 @@ def plot_pizza(resultados, titulo, subtitulo) -> plt.Figure:
     
     return fig
 
-@st.cache_data
-def compute_stats_df(df: pd.DataFrame) -> pd.DataFrame:
-    stats = df["area"].describe()
-    stats = stats.rename(
-        {
-            "count": "Contagem",
-            "mean": "Média",
-            "std": "Desvio Padrão",
-            "min": "Mínimo",
-            "25%": "1º Quartil",
-            "50%": "Mediana",
-            "75%": "3º Quartil",
-            "max": "Máximo",
-        }
-    )
-    return (
-        stats.to_frame(name="Área (ha)")
-        .reset_index()
-        .rename(columns={"index": "Estatística"})
-    )
+# @st.cache_data
+# def compute_stats_df(df: pd.DataFrame) -> pd.DataFrame:
+#     stats = df["area"].describe()
+#     stats = stats.rename(
+#         {
+#             "count": "Contagem",
+#             "mean": "Média",
+#             "std": "Desvio Padrão",
+#             "min": "Mínimo",
+#             "25%": "1º Quartil",
+#             "50%": "Mediana",
+#             "75%": "3º Quartil",
+#             "max": "Máximo",
+#         }
+#     )
+#     return (
+#         stats.to_frame(name="Área (ha)")
+#         .reset_index()
+#         .rename(columns={"index": "Estatística"})
+#     )
 
 @st.cache_data
 def plot_area_pizza(df: pd.DataFrame, titulo: str) -> plt.Figure:
@@ -203,9 +203,12 @@ def plot_area_pizza(df: pd.DataFrame, titulo: str) -> plt.Figure:
     fig, ax = plt.subplots(figsize=(8, 8))
     
     # Ordena as categorias para consistência
-    categorias_ordenadas = sorted(area_por_categoria.index)
+    categorias_ordenadas = sorted(area_por_categoria.index, reverse=True)
     areas_ordenadas = [area_por_categoria[cat] for cat in categorias_ordenadas]
     colors = [color_map[cat] for cat in categorias_ordenadas]
+
+    ax.set_title(f"Total de Área: {area_total:.2f} ha".replace('.', ','), fontsize=18)
+
     
     # Plot do gráfico de pizza
     wedges, texts, autotexts = ax.pie(
@@ -235,14 +238,16 @@ def plot_area_pizza(df: pd.DataFrame, titulo: str) -> plt.Figure:
     ax.legend(
         wedges,
         labels_legenda,
-        title="Propriedade",
+        title="Tipos de Propriedade",
         loc="upper center",
         bbox_to_anchor=(1, 0, 0.5, 1),
-        fontsize=12,
+        fontsize=14,
         title_fontsize=13
     )
     
     plt.tight_layout()
+    plt.subplots_adjust(right=0.7) 
+
     return fig
 
 def render_view_grafico_interativo(df_class):
@@ -286,7 +291,7 @@ def render_view_grafico_interativo(df_class):
                   """)
         col2.dataframe(df_tab, use_container_width=True, hide_index=True,)
         
-        col2.subheader("").markdown("#### Distribuição de Áreas por Propriedade")
+        col2.subheader("").markdown("#### Distribuição de Áreas por Tipo de Propriedade")
         col2.pyplot(fig_area_pizza)
 
     if resultados:
