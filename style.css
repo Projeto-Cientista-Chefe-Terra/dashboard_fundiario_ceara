@@ -79,6 +79,8 @@ h6 {
   font-weight: bold !important;
   color: var(--cor-primaria);
   margin-bottom: 8px !important;
+  padding-bottom: 0px !important;
+
   padding-top: 0px !important;
 }
 
@@ -89,6 +91,10 @@ h2 {
   margin-bottom: 10px !important;
   font-weight: bold;
   background-image: linear-gradient(to right, #008241 42%, #3B82F6);
+}
+
+h3 {
+  padding-bottom: 0px !important;
 }
 
 
@@ -118,7 +124,8 @@ h2 {
 }
 
 .stSelectbox > label > div > p {
-    font-weight: 600;
+    font-weight: 500;
+    color: var(--cor-dark-orange);
     font-family: "Raleway" !important;
 }
 

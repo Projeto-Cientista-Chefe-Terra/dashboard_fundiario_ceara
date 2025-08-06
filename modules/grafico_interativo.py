@@ -253,7 +253,7 @@ def plot_area_pizza(df: pd.DataFrame, titulo: str) -> plt.Figure:
 def render_view_grafico_interativo(df_class):
     col1, col2 = st.columns([6, 4])
     tab1, tab2 = col1.tabs(["Gráfico de Pizza","Gráfico de Barras"])
-    # col2.subheader("").markdown("##### Filtrar por:")
+    col2.subheader("").markdown("### Parâmetros de Busca:")
     co2_1, co2_2 = col2.columns([1, 1])
     opcao = co2_1.selectbox(
         "Filtrar por:", 
@@ -285,9 +285,9 @@ def render_view_grafico_interativo(df_class):
         tab2.pyplot(fig_barra)
         
 
-        col2.subheader("").markdown("#### Classificação de Propriedades")
+        col2.subheader("").markdown("### Classificação de Propriedades")
         col2.html(f"""
-                  <p id="op-ent"><b>[{opcao}]</b>{entidade} </p>
+                  <p id="op-ent"><b>{opcao}</b> - {entidade} </p>
                   """)
         col2.dataframe(df_tab, use_container_width=True, hide_index=True,)
         
