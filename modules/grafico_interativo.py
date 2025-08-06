@@ -214,7 +214,7 @@ def plot_area_pizza(df: pd.DataFrame, titulo: str) -> plt.Figure:
         colors=colors,
         startangle=90,
         autopct='%1.1f%%',
-        pctdistance=0.85,
+        pctdistance=0.75,
         textprops={'fontsize': 12}
     )
     
@@ -286,11 +286,11 @@ def render_view_grafico_interativo(df_class):
                   """)
         col2.dataframe(df_tab, use_container_width=True, hide_index=True,)
         
-        # col2.subheader("").markdown("#### Distribuição de Áreas por Propriedade")
-        # col2.pyplot(fig_area_pizza)
+        col2.subheader("").markdown("#### Distribuição de Áreas por Propriedade")
+        col2.pyplot(fig_area_pizza)
 
     if resultados:
-        st.html("<h5>Dados atualizados em 24/02/2025</h5>")
+        col1.markdown("##### Dados atualizados em 24/02/2025")
         df_tab = pd.DataFrame(
             list(resultados.items()), columns=["Categoria", "Quantidade"]
         )
