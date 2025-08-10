@@ -121,7 +121,7 @@ def mapa_hidrográfico():
 ######################### Sobre o projeto  #######################
 def sobre():
     with st.container():
-        st.html("""<div class="teste">s</div>""")
+        st.html("""<div class="teste"></div>""")
         st.markdown(
             """
         Aplicação de painéis contendo dados estatísticos e geoespaciais da malha fundiária cearense desenvolvido, principalmente, a partir dos dados cadastrados no Instituto de Desenvolvimento Agrário do Ceará (IDACE). Este software faz parte das ações realizadas no âmbito do projeto **Cientista Chefe Terra  de Governança Fundiária e Ambiental**, parceria entre o IDACE, a Universidade Federal do Ceará (UFC) e a Fundação Cearense de Apoio ao Desenvolvimento Científico e Tecnológico (Funcap).
