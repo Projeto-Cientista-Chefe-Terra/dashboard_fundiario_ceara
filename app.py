@@ -457,12 +457,12 @@ with open("style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 
+st.logo("./assets/Frame 18.png", size="large")
 if "current_page" not in st.session_state:
     st.session_state.current_page = "Inicio"
 
 
 
-    st.logo("./assets/Frame 18.png", size="large")
 # if st.session_state.current_page != 'Inicio':
     # st.logo("./assets/Frame 18.png", size="large")
 with st.sidebar:
