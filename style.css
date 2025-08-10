@@ -4,18 +4,15 @@
   */
 
 /* 1. Importa Jakarta Sans do Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Maitree:wght@200;300;400;500;600;700&display=swap&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Maitree:wght@200;300;400;500;600;700&display=swap&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap");
 
 :root {
   --cor-primaria: #008241;
   --cor-secundaria: #5db12f;
   --cor-texto: #333333;
   --cor-fundo: #ffffff;
-  --cor-dark-orange: #ED6A23;
+  --cor-dark-orange: #ed6a23;
 }
-
-
-
 
 html,
 body,
@@ -34,8 +31,7 @@ body {
 }
 
 p {
-    font-family: "Maitree" !important;
-
+  font-family: "Maitree" !important;
 }
 
 .stApp {
@@ -85,18 +81,23 @@ h6 {
 }
 
 h2 {
-  color: #FFFFFF !important;
+  color: #ffffff !important;
   padding: 24px 16px !important;
   font-size: 40px !important;
   margin-bottom: 10px !important;
   font-weight: bold;
-  background-image: linear-gradient(to right, #008241 42%, #3B82F6);
+  background-image: linear-gradient(to right, #008241 42%, #3b82f6);
 }
 
 h3 {
   padding-bottom: 0px !important;
 }
 
+h4 {
+  font-size: 24px;
+  color: #24A64A;
+  margin-top: 0px;
+}
 
 .stMainBlockContainer {
   padding-right: 0px;
@@ -105,7 +106,6 @@ h3 {
 
 .stHorizontalBlock {
   margin: 0vw 2%;
-
 }
 
 .stHeading h1 {
@@ -124,9 +124,9 @@ h3 {
 }
 
 .stSelectbox > label > div > p {
-    font-weight: 500;
-    color: var(--cor-dark-orange);
-    font-family: "Raleway" !important;
+  font-weight: 500;
+  color: var(--cor-dark-orange);
+  font-family: "Raleway" !important;
 }
 
 /* 9. Inputs, selects e áreas de texto */
@@ -158,7 +158,7 @@ h3 {
   border-bottom: #0c0906 !important;
 }
 
-.stTabs div[data-baseweb="tab-highlight"]{
+.stTabs div[data-baseweb="tab-highlight"] {
   background-color: var(--cor-dark-orange);
 }
 
@@ -184,7 +184,7 @@ h3 {
     box-shadow: none !important;
 } */
 .stSelectbox p {
-  color: var(--cor-primaria);;
+  color: var(--cor-primaria);
   font-size: 1.25rem;
 }
 
@@ -192,7 +192,7 @@ h3 {
 footer,
 .stMarkdown {
   font-family: "Raleway" !important;
-  color: var(--cor-primaria);;
+  color: var(--cor-primaria);
 }
 
 .stSelectbox div > div {
@@ -206,7 +206,7 @@ footer,
 
 .stApp > header {
   background-color: transparent;
-  color: var(--cor-primaria);;
+  color: var(--cor-primaria);
 }
 
 .stMain > div {
@@ -215,11 +215,10 @@ footer,
 
 .stRadio > label > div > p {
   font-family: "Raleway" !important;
-  color: var(--cor-primaria);;
+  color: var(--cor-primaria);
   font-weight: 700;
   font-size: 20px;
-} 
-
+}
 
 .custom-header {
   position: fixed;
@@ -267,14 +266,12 @@ footer,
   margin-top: 40px;
 }
 
-
-
 .stExpander {
   color: #000000;
 }
 
 .stExpander summary p {
-  font-family: 'Raleway' !important;
+  font-family: "Raleway" !important;
   font-size: 1rem;
   font-weight: 700;
 }
@@ -284,15 +281,14 @@ footer,
 }
 
 .stExpander .stVerticalBlock p {
-    color: #555555;
+  color: #555555;
 }
 .stExpander .stVerticalBlock ul {
-    color: #555555;
+  color: #555555;
 }
 
-
 body {
-  max-height:  1200;
+  max-height: 1200;
 }
 
 div[data-testid="stSidebarHeader"] {
@@ -303,15 +299,820 @@ div[data-testid="stImageContainer"] {
   align-items: center;
 }
 
-div[data-testid="stImageContainer"]  > img {
+div[data-testid="stImageContainer"] > img {
   width: 80% !important;
 }
 
 span[data-testid="stIconMaterial"] {
   font-size: 24px;
-  color:#0D5221 !important;
-;
+  color: #0d5221 !important;
 }
+
+/* .stVerticalBlock .stButton {
+  color: #008241 !important;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 999991;
+} */
+
+/* .full-width-img > img{
+        width: 100% !important;
+        height: auto;  
+    }
+
+/* .stElementContainer div {
+  width: 100% !important;
+} 
+
+.stElementContainer div[data-testid="stImageContainer"]  > img {
+  width: 100% !important;
+  height: 400;
+  object-fit: cover;  
+        
+} */
+
+.minha-div {
+  width: 100%;
+  /* height: 450px; Altura fixa */
+  overflow: hidden; /* Corta excessos */
+}
+
+.minha-div img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Preenche o espaço sem distorcer (corta excessos) */
+  object-position: 0 50%;
+  /* object-fit: contain;  Mostra a imagem inteira (com bordas) */
+}
+
+.container-estilizado {
+  display: flex;
+  width: 97%;
+  margin-left: 1% !important;
+  margin-right: 1% !important;
+  border-left: 4px solid #4CAF50;
+  padding-left: 15px;
+  margin: 20px 0px;
+  font-family: Raleway;
+  font-weight: 600;
+  justify-content: space-between;
+
+}
+
+.container-estilizado2 {
+  display: bloxk;
+  width: 97%;
+  margin-left: 1% !important;
+  margin-right: 1% !important;
+  font-family: Raleway;
+  font-weight: 600;
+}
+
+
+
+
+.container-estilizado2 p {
+  color: #000000;
+  padding: 0px 12px;
+}
+
+.container-estilizado  h3 {
+    font-size: 1.75rem !important;
+    margin-top: 0px;
+    margin-bottom: 0px !important;
+    display: inline-block;
+
+}
+
+.container-estilizado > div {
+    flex: 1;
+    /* padding: 10px; */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.container-estilizado > a {
+    flex: 0.75;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.container-estilizado span {
+    display: block;
+    padding-left: 4px;
+    /* margin: 8px 0; */
+}
+
+.imagem-link {
+    max-width: 80%;
+    height: auto;
+    border-radius: 4px;
+    transition: transform 0.3s;
+}
+
+.imagem-link:hover {
+    transform: scale(1.05);
+}
+
+.titulo {
+  color: #24A64A;
+}
+
+.subtitulo {
+  color: #000000;
+  padding-bottom: 4px;
+}
+
+.wrapper {
+	max-width: 1220px;
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: 50px;
+	padding-right: 50px;
+  font-size: 75.5%;
+}
+
+footer .wrapper {
+	max-width: 1274px;
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: 60px;
+	padding-right: 50px;
+  font-size: 75.5%;
+}
+
+
+
+.row {
+	margin-left: -20px;
+	margin-right: -20px;
+}
+
+.nested {
+	margin-bottom: 0 !important;
+}
+
+.wrapper:before,
+.row:before {
+	display: table;
+	content: " ";
+}
+
+.wrapper:after,
+.row:after {
+	clear: both;
+	display: table;
+	content: " ";
+}
+
+
+/* Acesso rápidos */
+.AcessoRapido {
+  padding-top: 0;
+  background-color: #e9e9e9;
+  
+}
+
+/* line 9, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido .row {
+  margin: 0;
+  border-top: 1px solid rgba(72, 81, 86, 0.5);
+}
+
+/* line 14, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido h4 {
+  /* Positioning */
+  margin: 25px 0;
+  /* Typography */
+  margin: 25px 0 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font: 1.0em / 1.4em "Raleway" !important;
+  line-height: 2;
+  font-weight: 900 !important;
+  color: #000;
+}
+
+
+.row {
+  margin: 0px 40px;
+}
+
+.acesso-rapido {
+  width: 104%;
+}
+
+/* line 26, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido .menu {
+  /* Positioning */
+  margin: 0 -26px;
+  /* Typography */
+  text-align: center;
+}
+
+/* line 33, resources/sass/components/_acesso-rapido.scss */
+
+
+/* line 46, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido .menu-item a {
+  /* Typography */
+  font: 1.1em / 1.4em "Raleway";
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: #000;
+  line-height: -5rem;
+  text-decoration: none;
+  font-weight: 800;
+    transition: color 0.3s ease 0.1s; /* delay para sincronizar com o background */
+
+}
+
+/* line 57, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido .menu-item i {
+  /* Positioning */
+  margin-bottom: 10px;
+  position: relative;
+  display: block;
+  /* Box-model */
+  width: 100%;
+  height: 80px;
+  /* Visual */
+  background-color: #fff;
+}
+
+/* line 67, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido .menu-item i:after {
+  /* Positioning */
+  position: absolute;
+  display: block;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /* Box-model */
+  height: 4px;
+  /* Visual */
+  background-color: #00a84a;
+  /* Misc */
+  content: '';
+  -webkit-transition: height 0.2s ease-in-out;
+  transition: height 0.2s ease-in-out;
+}
+
+.AcessoRapido ul {
+    padding-left: 0px !important;
+    /* margin-block-start: 0em;
+    margin-block-end: 0em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 0px;
+    unicode-bidi: isolate; */
+        font: inherit;
+    vertical-align: baseline;
+}
+
+
+/* Estilo base para o menu */
+#menu-acesso-rapido-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  list-style: none;
+  padding: 0;
+  /* margin: 0; */
+  width: 100%;
+}
+
+/* Estilo para cada item do menu */
+#menu-acesso-rapido-footer .menu-item {
+  flex: 0 0 16.4%; /* Não cresce, não encolhe, largura base de 16.4% */
+  box-sizing: border-box;
+  padding: 10px 25px 0px;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+/* Estilo para os links */
+#menu-acesso-rapido-footer .menu-item a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  height: 100%;
+}
+
+/* Estilo para os ícones (ajuste conforme seu CSS existente) */
+
+
+/* Estilo para os spans de texto */
+
+
+/* Responsividade - Tablet */
+@media (max-width: 992px) {
+  #menu-acesso-rapido-footer .menu-item {
+    flex: 0 0 33.33%; /* 3 itens por linha */
+  }
+}
+
+/* Responsividade - Mobile */
+@media (max-width: 768px) {
+  #menu-acesso-rapido-footer .menu-item {
+    flex: 0 0 50%; /* 2 itens por linha */
+        padding: 10px 6px 0px;
+
+  }
+
+  #menu-acesso-rapido_footer .menu-item {
+    padding: 10px 6px 0px;
+  }
+}
+
+/* Responsividade - Telas muito pequenas */
+@media (max-width: 480px) {
+  #menu-acesso-rapido-footer .menu-item {
+    flex: 0 0 100%; /* 1 item por linha */
+  }
+}
+
+
+@media (max-width: 1219px) {
+	.wrapper {
+		max-width: 1220px;
+	}
+}
+
+@media (max-width : 1219px) {
+	.wrapper {
+		max-width: 1024px;
+    padding: 0px;
+	}
+}
+
+/* line 142, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido .menu-item i.PortalTransparencia {
+  background: url(https://www.idace.ce.gov.br/wp-content/themes/ceara2017/assets/images/ico-acesso-rapido/portal-da-transparencia.svg) center center no-repeat #fff;
+}
+
+/* line 146, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido .menu-item i.AcessoCidadao {
+  background: url(https://www.idace.ce.gov.br/wp-content/themes/ceara2017/assets/images/ico-acesso-rapido/acesso-cidadao.svg) center center no-repeat #fff;
+}
+
+/* line 150, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido .menu-item i.AcessoInformacao {
+  background: url(https://www.idace.ce.gov.br/wp-content/themes/ceara2017/assets/images/ico-acesso-rapido/lei-geral-de-acesso-informacao.svg) center center no-repeat #fff;
+}
+
+/* line 154, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido .menu-item i.DiarioOficial {
+  background: url(https://www.idace.ce.gov.br/wp-content/themes/ceara2017/assets/images/ico-acesso-rapido/diario-oficial.svg) center center no-repeat #fff;
+}
+
+/* line 158, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido .menu-item i.Legislacao {
+  background: url(https://www.idace.ce.gov.br/wp-content/themes/ceara2017/assets/images/ico-acesso-rapido/legislacao-estadual.svg) center center no-repeat #fff;
+}
+
+/* line 162, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido .menu-item i.AcoesGoverno {
+  background: url(https://www.idace.ce.gov.br/wp-content/themes/ceara2017/assets/images/ico-acesso-rapido/acoes-de-governo.svg) center center no-repeat #fff;
+}
+
+/* line 166, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido .menu-item i.PortalTransparencia:after {
+  background: url(https://www.idace.ce.gov.br/wp-content/themes/ceara2017/assets/images/ico-acesso-rapido/portal-da-transparencia-.svg) center bottom 15px no-repeat #00a84a;
+  background-size: 50px !important;
+}
+
+/* line 171, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido .menu-item i.AcessoCidadao:after {
+  background: url(https://www.idace.ce.gov.br/wp-content/themes/ceara2017/assets/images/ico-acesso-rapido/acesso-cidadao-.svg) center bottom 15px no-repeat #00a84a;
+  background-size: 50px !important;
+}
+
+/* line 176, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido .menu-item i.AcessoInformacao:after {
+  background: url(https://www.idace.ce.gov.br/wp-content/themes/ceara2017/assets/images/ico-acesso-rapido/lei-geral-de-acesso-informacao-.svg) center bottom 15px no-repeat #00a84a;
+  background-size: 50px !important;
+}
+
+/* line 181, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido .menu-item i.DiarioOficial:after {
+  background: url(https://www.idace.ce.gov.br/wp-content/themes/ceara2017/assets/images/ico-acesso-rapido/diario-oficial-.svg) center bottom 15px no-repeat #00a84a;
+  background-size: 50px !important;
+}
+
+/* line 186, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido .menu-item i.Legislacao:after {
+  background: url(https://www.idace.ce.gov.br/wp-content/themes/ceara2017/assets/images/ico-acesso-rapido/legislacao-estadual-.svg) center bottom 15px no-repeat #00a84a;
+  background-size: 50px !important;
+}
+
+/* line 191, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido .menu-item i.AcoesGoverno:after {
+  background: url(https://www.idace.ce.gov.br/wp-content/themes/ceara2017/assets/images/ico-acesso-rapido/acoes-de-governo-.svg) center bottom 15px no-repeat #00a84a;
+  background-size: 50px !important;
+}
+
+/* line 195, resources/sass/components/_acesso-rapido.scss */
+.AcessoRapido .menu-item i {
+  background-size: 50px !important;
+}
+
+
+
+.AcessoRapido .menu-item::before {
+  /* position: absolute; */
+  bottom: -100%;
+
+  background-color: #00a84a;
+  transition: bottom 0.3s ease;
+}
+
+
+.AcessoRapido .menu-item a:hover i {
+  position: relative;
+  overflow: hidden;
+}
+
+.AcessoRapido .menu-item a:hover i:after {
+  height: 100%; /* Faz a barra verde subir e preencher todo o ícone */
+  background-color: #00a84a; /* Mantém a cor verde */
+  transition: height 0.3s ease-in-out; /* Animação suave */
+}
+
+
+
+/* Mantém o background do ícone branco por padrão */
+.AcessoRapido .menu-item i {
+  transition: all 0.3s ease-in-out;
+}
+
+
+.AcessoRapido .menu-item a span {
+    font-size: 0.8em;
+  line-height: 1.5; /* Valor sem unidade - relativo ao font-size */
+  display: inline-block; /* Fundamental para spans */
+}
+
+
+
+
+
+/* Footer */
+footer {
+  /* Box-model */
+  padding: 20px 0 0;
+  /* Visual */
+  background-color: #fff;
+  border-top: 3px solid #008442;
+}
+
+/* line 14, resources/sass/components/_footer.scss */
+footer .logo {
+  /* Positioning */
+  margin: 10px 0 0;
+}
+
+/* line 19, resources/sass/components/_footer.scss */
+footer .row {
+  margin: 0;
+}
+
+/* line 23, resources/sass/components/_footer.scss */
+footer .MapaSite {
+  /* Positioning */
+  margin: 25px 0 0;
+  padding-right: 0;
+}
+
+/* line 34, resources/sass/components/_footer.scss */
+footer .MapaSite .menu li {
+  /* Positioning */
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  margin: 0 7px 0;
+}
+
+/* line 42, resources/sass/components/_footer.scss */
+footer .MapaSite .menu > li:first-child {
+  margin-left: 0;
+}
+
+/* line 47, resources/sass/components/_footer.scss */
+footer .MapaSite .menu > li:last-child {
+  margin-right: 0;
+}
+
+/* line 52, resources/sass/components/_footer.scss */
+footer .MapaSite .menu li a {
+  /* Typography */
+  font: 1.1em "OpenSans-Bold", Helvetica, Arial, sans-serif;
+  color: #485156 !important;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+/* line 59, resources/sass/components/_footer.scss */
+footer .MapaSite .menu li a:hover {
+  /* Typography */
+  text-decoration: underline;
+}
+
+/* line 63, resources/sass/components/_footer.scss */
+footer .MapaSite .menu li .sub-menu a {
+  /* Typography */
+  font: 1.1em "OpenSans-Regular", Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+/* line 69, resources/sass/components/_footer.scss */
+footer .MapaSite .menu li .sub-menu li {
+  /* Positioning */
+  display: block;
+  margin: 10px 0;
+}
+
+/* line 77, resources/sass/components/_footer.scss */
+footer .Infos {
+  /* Positioning */
+  margin: 20px 0 40px;
+  /* Visual */
+  border-top: 1px solid #cccccc;
+  /* Box-model */
+  padding: 20px 0 0;
+}
+
+/* line 88, resources/sass/components/_footer.scss */
+footer .Infos .NomeSite .link-gov h2 {
+  font: 1.1em "OpenSans-Semibold", Helvetica, Arial, sans-serif;
+  color: #485156 !important;
+  text-transform: uppercase;
+}
+
+/* line 96, resources/sass/components/_footer.scss */
+footer .FaleConosco {
+  padding-right: 0;
+}
+
+/* line 103, resources/sass/components/_footer.scss */
+footer .FaleConosco h2 {
+  /* Typography */
+  font: 1.2em "OpenSans-Bold", Helvetica, Arial, sans-serif;
+  color: #485156 !important;
+  text-transform: uppercase;
+}
+
+/* line 109, resources/sass/components/_footer.scss */
+footer .FaleConosco h2.canais {
+  /* Positioning */
+  margin: 15px 0;
+}
+
+/* line 114, resources/sass/components/_footer.scss */
+footer .FaleConosco .link-contato {
+  /* Positioning */
+  display: inline-block;
+  vertical-align: top;
+  margin: 13px 0;
+  /* Box-model */
+  width: 49%;
+  height: 35px;
+  padding: 0 0 0 40px;
+}
+
+/* line 125, resources/sass/components/_footer.scss */
+footer .FaleConosco .link-contato a {
+  /* Typography */
+  font: 1.1em "OpenSans-Regular", Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: #485156 !important;
+}
+
+/* line 134, resources/sass/components/_footer.scss */
+footer .FaleConosco .link-contato.whatsapp {
+  /* Visual */
+  background: url(../images/footer/noticias-por-whatsapp.svg) top 0 left 0 no-repeat;
+  background-size: 30px;
+}
+
+/* line 139, resources/sass/components/_footer.scss */
+footer .FaleConosco .link-contato.email {
+  /* Visual */
+  background: url(../images/footer/noticias-por-email.svg) top 0 left 0 no-repeat;
+  background-size: 30px;
+}
+
+/* line 144, resources/sass/components/_footer.scss */
+footer .FaleConosco .link-contato.ouvidoria {
+  /* Visual */
+  background: url(../images/footer/fale-conosco-ouvidoria.svg) top 0 left 0 no-repeat;
+  background-size: 30px;
+}
+
+/* line 149, resources/sass/components/_footer.scss */
+footer .FaleConosco .link-contato.imprensa {
+  /* Visual */
+  background: url(../images/footer/espaco-imprensa.svg) top 0 left 0 no-repeat;
+  background-size: 30px;
+}
+
+/* line 155, resources/sass/components/_footer.scss */
+footer .FaleConosco .redesLink {
+  /* Positioning */
+  margin: 0 15px 0 0;
+  /* Typography */
+  text-indent: 0;
+}
+
+/* line 162, resources/sass/components/_footer.scss */
+footer .FaleConosco .redesLink a {
+  /* Positioning */
+  display: block;
+  /* Typography */
+  text-indent: -9999px;
+  background: transparent !important;
+}
+
+/* line 174, resources/sass/components/_footer.scss */
+footer .boxFale {
+  /* Box-model */
+  padding: 20px 25px;
+  /* Visual */
+  background: #e9e9e9;
+}
+
+/* line 185, resources/sass/components/_footer.scss */
+footer .Direitos .box {
+  /* Positioning */
+  display: inline-block;
+  position: relative;
+  float: left;
+  margin: 0 20px 0 0;
+}
+
+/* line 192, resources/sass/components/_footer.scss */
+footer .Direitos .box h2 {
+  /* Typography */
+  font: 1em "Kanit" !important;
+  
+  line-height: 1.5 !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  color: #485156 !important;
+  background: none;
+}
+
+/* line 199, resources/sass/components/_footer.scss */
+footer .Direitos .box p {
+  /* Typography */
+  font: 11px "OpenSans-Regular", Helvetica, Arial, sans-serif !important;
+  line-height: 1.5 !important;
+  text-transform: uppercase;
+  color: #485156 !important;
+  margin: 0;
+}
+
+
+
+.NomeSite > a {
+ color: #000 !important;
+  font: 1.4em "OpenSans-Light", Helvetica, Arial, sans-serif !important;
+  line-height: 2em;
+      text-decoration: none;
+    outline: none !important;
+}
+.NomeSite  h2 {
+  font: 1.4em "OpenSans-Light", Helvetica, Arial, sans-serif !important;
+  line-height: 2em;
+  text-decoration: none;
+  outline: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: inline;
+}
+
+.Direitos h2{
+  margin: 0 !important;
+  padding: 0 !important;
+      letter-spacing: 1px;
+
+}
+
+/* line 208, resources/sass/components/_footer.scss */
+footer .Direitos .box.copyright {
+  /* Positioning */
+  float: right;
+  margin: 0 0 0 0;
+}
+
+
+.dt-1, .tl-1, .tp-1, .ml-1, .mp-1,
+.dt-2, .tl-2, .tp-2, .ml-2, .mp-2,
+.dt-3, .tl-3, .tp-3, .ml-3, .mp-3,
+.dt-4, .tl-4, .tp-4, .ml-4, .mp-4,
+.dt-5, .tl-5, .tp-5, .ml-5, .mp-5,
+.dt-6, .tl-6, .tp-6, .ml-6, .mp-6,
+.dt-7, .tl-7, .tp-7, .ml-7, .mp-7,
+.dt-8, .tl-8, .tp-8, .ml-8, .mp-8,
+.dt-9, .tl-9, .tp-9, .ml-9, .mp-9,
+.dt-10, .tl-10, .tp-10, .ml-10, .mp-10,
+.dt-11, .tl-11, .tp-11, .ml-11, .mp-11,
+.dt-12, .tl-12, .tp-12, .ml-12, .mp-12 {
+	float: left;
+	padding-left: 20px;
+	padding-right: 20px;
+	min-height: 1px;
+	margin-bottom: 20px;
+}
+
+.dt-10 {
+      width: 78.333333333333%;
+
+}
+/* .dt-2 {
+	width: 16.666666666667%;
+} */
+
+/* line 6, resources/sass/components/_footer-sitefilho.scss */
+footer .Infos .NomeSite .link-gov h2 {
+  font: 0.96em "OpenSans-Semibold", Helvetica, Arial, sans-serif !important;
+  color: #485156 !important;
+  text-transform: uppercase;
+  background: none !important;
+    font-weight: 600 !important;
+
+
+}
+
+div:has(> .stElementContainer > .stHtml > .teste) {
+  width: 98%;
+  margin: auto;
+}
+
+/* line 41, resources/sass/components/_redes-sociais.scss */
+.redesLink, .redesLinkRodape {
+  /* Positioning */
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  /* Box-model */
+  width: 29px;
+  height: 30px;
+  /* Typography */
+  text-indent: -9999px;
+  /* Misc */
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  background-color: #fff !important;
+}
+
+/* line 59, resources/sass/components/_redes-sociais.scss */
+.redesLink > a, .redesLinkRodape > a {
+  width: 30px;
+  height: 30px;
+  display: table;
+}
+
+/* line 67, resources/sass/components/_redes-sociais.scss */
+.redesLinkRodape a {
+  background: transparent !important;
+}
+
+/* line 72, resources/sass/components/_redes-sociais.scss */
+.redesLink.facebook, .redesLinkRodape.facebook {
+  /* Visual */
+  background: url(https://www.idace.ce.gov.br/wp-content/themes/ceara2017/assets/images/redesSociais/facebook.png) center center no-repeat;
+}
+
+/* line 76, resources/sass/components/_redes-sociais.scss */
+.redesLink.instagram, .redesLinkRodape.instagram {
+  /* Visual */
+  background: url(https://www.idace.ce.gov.br/wp-content/themes/ceara2017/assets/images/redesSociais/instagram.png) center center no-repeat;
+}
+
+.menu {
+  list-style: none;
+      margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+/* .stVerticalBlock {
+  width: 98%;
+  margin: auto;
+} */
 
 /* ============ MEDIA QUERIES ============ */
 
@@ -390,7 +1191,7 @@ span[data-testid="stIconMaterial"] {
 
   .stSidebar img {
     width: 80% !important;
-  height: 100% !important;
+    height: 100% !important;
   }
 
   .stDataFrameWrapper,
@@ -401,10 +1202,9 @@ span[data-testid="stIconMaterial"] {
 
 /* Smartphone pequeno (até 479px) */
 @media screen and (max-width: 479px) {
-
   .stMainBlockContainer {
-  margin-top: 30px;
-}
+    margin-top: 30px;
+  }
 
   html,
   body,
