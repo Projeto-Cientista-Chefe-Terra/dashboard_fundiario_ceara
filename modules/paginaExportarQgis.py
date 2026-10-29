@@ -131,7 +131,7 @@ def renderizar() -> None:
                 return
             municipio = st.selectbox("Município", municipios, format_func=exportacaoQgis.nomeOficial)
         if tipo == RECORTE_ESTADO:
-            st.caption("O pacote do estado tem todos os lotes (cerca de 50 MB) e pode levar alguns minutos "
+            st.caption("O pacote do estado tem todos os lotes (cerca de 40 MB) e leva cerca de um minuto "
                        "para ficar pronto na primeira vez.")
 
         pedido = (tipo, regiao, municipio)
