@@ -9,6 +9,8 @@ pandas
 numpy
 geopandas
 shapely
+pyproj
+pyarrow
 matplotlib
 requests
 PyJWT

@@ -78,10 +78,41 @@ ativa. O resto fica em `modules/`:
 | `camadasMapa.py`, `basemap.py` | Camadas, controles e camada base dos mapas |
 | `componentesUi.py` | Trechos de interface repetidos entre páginas |
 | `navegacao.py` | Tabela de páginas e menu lateral |
+| `exportacaoQgis.py` | Pacote para o QGIS: shapefiles, estilos, projeto e README |
 | `pagina*.py` | Uma página do dashboard por módulo |
 
 Os dados são recarregados do miniserver a cada 24 horas (`config.TTL_DADOS`).
 O miniserver recebe a carga nova uma vez por mês.
+
+## Exportação para o QGIS
+
+A página **Exportar para o QGIS** gera um `.zip` com os lotes de um município,
+de uma região administrativa ou do estado, para abrir no QGIS:
+
+- `<nome>_lotes.shp`: os lotes, coloridos pela categoria de tamanho em módulos
+  fiscais, com as mesmas cores do dashboard;
+- `<nome>_municipio.shp` ou `<nome>_municipios.shp`: os limites municipais, com
+  o nome de cada município na região e no estado;
+- um `.qml` por camada, um projeto `<nome>.qgs` que abre as duas já estilizadas
+  e um `README.txt` com o módulo fiscal, as faixas das categorias e os campos.
+
+O nome do proprietário nunca é exportado. A montagem fica em
+`modules/exportacaoQgis.py`, que não depende do Streamlit. Na página, os lotes vêm
+da API sem simplificação (`tolerance=0`) e cada pacote fica em cache pela versão
+dos dados. Os limites municipais vêm simplificados pela API (cerca de 100 m).
+
+O mesmo pacote pode ser gerado pela linha de comando, a partir dos CSVs do
+miniserver, com a geometria original dos limites e o `lote_id`:
+
+```bash
+python scripts/gerarPacoteQgis.py municipio salitre
+python scripts/gerarPacoteQgis.py regiao litoral_oeste_vale_do_curu
+python scripts/gerarPacoteQgis.py estado --destino ~/temp
+python scripts/gerarPacoteQgis.py --listar
+```
+
+O nome vai sem acento, em minúsculas e com `_` no lugar dos espaços. Os CSVs são
+lidos de `../terraGeoDataMiniServer/datasets` (outra pasta com `--datasets`).
 
 ## Configuração
 

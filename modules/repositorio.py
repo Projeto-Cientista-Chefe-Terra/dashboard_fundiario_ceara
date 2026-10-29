@@ -176,6 +176,17 @@ def carregarGeojsonLotes(regiao: str | None = None, municipio: str | None = None
     return apiCliente.buscarJson("geojson", parametros, permitir404=True) or GEOJSON_VAZIO
 
 
+def carregarGeojsonLotesSemSimplificacao(regiao: str | None = None, municipio: str | None = None) -> dict:
+    """Polígonos originais dos imóveis de uma região ou de um município, para exportação.
+
+    Sem cache: o resultado é grande e só serve para montar o pacote do QGIS, que
+    ``paginaExportarQgis`` guarda em cache já pronto.
+    """
+    parametros = {"regiao": regiao} if regiao else {"municipio": municipio}
+    parametros["tolerance"] = 0
+    return apiCliente.buscarJson("geojson", parametros, permitir404=True) or GEOJSON_VAZIO
+
+
 @_conferindoVersao
 @st.cache_data(ttl=config.TTL_DADOS, show_spinner="Carregando assentamentos...")
 def carregarAssentamentos(municipio: str = "todos", tolerancia: float | None = None) -> dict:

@@ -12,8 +12,8 @@ from collections.abc import Callable
 import streamlit as st
 
 from modules import (
-    paginaAssentamentos, paginaConcentracao, paginaEscolasCampo, paginaGraficos, paginaHidrografia,
-    paginaInicio, paginaMalhaFundiaria, paginaPredominancia, paginaSobre,
+    paginaAssentamentos, paginaConcentracao, paginaEscolasCampo, paginaExportarQgis, paginaGraficos,
+    paginaHidrografia, paginaInicio, paginaMalhaFundiaria, paginaPredominancia, paginaSobre,
 )
 
 CHAVE_SESSAO = "paginaAtual"
@@ -45,6 +45,8 @@ PAGINAS = [
            "Mapa de Assentamentos", paginaAssentamentos.renderizar),
     Pagina("hidrografia", "Mapa Hidrográfico", ":material/water_drop:", "Mapa Hidrográfico", paginaHidrografia.renderizar),
     Pagina("escolasCampo", "Mapa Escolas do Campo", ":material/school:", "Mapa Escolas do Campo", paginaEscolasCampo.renderizar),
+    Pagina("exportarQgis", "Exportar para o QGIS", ":material/download:", "Exportar Dados para o QGIS",
+           paginaExportarQgis.renderizar),
     Pagina("sobre", "Sobre", ":material/info:", None, paginaSobre.renderizar),
 ]
 PAGINAS_POR_CHAVE = {pagina.chave: pagina for pagina in PAGINAS}
