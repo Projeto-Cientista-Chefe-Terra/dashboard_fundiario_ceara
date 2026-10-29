@@ -119,6 +119,7 @@ h4 {
 
 .stHorizontalBlock {
   margin: 0vw 2%;
+  width: auto; /* com o width: 100% do Streamlit, a margem passava da borda direita */
 }
 
 .stHeading h1 {
