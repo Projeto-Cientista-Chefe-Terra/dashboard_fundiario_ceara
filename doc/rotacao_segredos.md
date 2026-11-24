@@ -35,7 +35,7 @@ Faça uma vez, antes da primeira rotação.
 2. **Troque a senha dentro do Postgres.** A variável `POSTGRES_PASSWORD` só vale na criação do banco. Com o banco já criado, a troca é feita por SQL:
 
    ```bash
-   podman exec -it terra_postgis psql -U terra -d geodata -c "ALTER USER terra WITH PASSWORD 'NOVA_SENHA';"
+   docker exec -it terrace-postgres psql -U terra -d geodata -c "ALTER USER terra WITH PASSWORD 'NOVA_SENHA';"
    ```
 
 3. **Atualize as variáveis da stack** no Portainer: `JWT_SECRET` e `POSTGRES_PASSWORD`, sem aspas.
